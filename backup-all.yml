@@ -20,6 +20,11 @@
     - debug:
         msg: "backup_templates_list: {{ backup_templates_list }}"
 
+    - name: Include hosting vars
+      include_vars:
+        file: /var/lib/awx/projects/hosting/hosting_vars.yml
+      no_log: True
+
     - name: Collect AWX admin token the hard way!
       delegate_to: 127.0.0.1
       shell: |
