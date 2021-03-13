@@ -1,0 +1,36 @@
+
+- name: "Performs a sequential backup of every server connected to AWX."
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Generate list of backup job templates
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Backup Server/g'
+      register: backup_templates
+
+    - debug:
+        msg: "backup_templates: {{ backup_templates }}"
+
+    - name: Divide list of backup templates into array
+      set_fact:
+        backup_templates_list: backup_templates.stdout.splitlines()
+
+    - debug:
+        msg: "backup_templates_list: {{ backup_templates_list }}"
+
+    - name: Collect AWX admin token the hard way!
+      delegate_to: 127.0.0.1
+      shell: |
+          curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+      register: tower_token
+      no_log: True 
+
+    - name: Execute every job template sequentially
+      awx.awx.tower_job_template:
+        job_template: "{{ item }}"
+        tower_host: "https://{{ tower_host }}"
+        tower_oauthtoken: "{{ tower_token.stdout }}"
+        validate_certs: yes  
+      loop: "{{ backup_templates_list|flatten(levels=1) }}"
