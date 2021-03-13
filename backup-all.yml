@@ -15,7 +15,7 @@
 
     - name: Divide list of backup templates into array
       set_fact:
-        backup_templates_list: backup_templates.stdout.splitlines()
+        backup_templates_list: "{{ backup_templates.stdout.splitlines() }}"
 
     - debug:
         msg: "backup_templates_list: {{ backup_templates_list }}"
@@ -38,4 +38,4 @@
         tower_host: "https://{{ tower_host }}"
         tower_oauthtoken: "{{ tower_token.stdout }}"
         validate_certs: yes  
-      loop: "{{ backup_templates_list|flatten(levels=1) }}"
+      loop: "{{ backup_templates.stdout_lines | flatten(levels=1) }}"
