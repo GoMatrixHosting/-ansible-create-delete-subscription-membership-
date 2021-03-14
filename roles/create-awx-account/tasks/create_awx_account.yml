@@ -58,8 +58,8 @@
     organization: "{{ member_id }}"
     credential_type: Machine
     inputs:
-      ssh_key_data: "{{ lookup('file', '/var/lib/awx/projects/hosting/private.key') }}"
-      ssh_key_unlock: "{{ private_ssh_key_password }}"
+      ssh_key_data: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_private.key') }}"
+      ssh_key_unlock: "{{ client_private_ssh_key_password }}"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
@@ -128,7 +128,7 @@
     survey_spec: "{{ lookup('file', './roles/create-awx-account/surveys/provision_survey_digitalocean.json') }}"
     state: present
     verbosity: 1
-    job_tags: imposter-check, setup-export
+    job_tags: imposter-check, setup-firewall, setup-export, setup-backup
     skip_tags: digitalocean-space
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
@@ -149,7 +149,7 @@
     survey_spec: "{{ lookup('file', './roles/create-awx-account/surveys/provision_survey_on-premises.json') }}"
     state: present
     verbosity: 1
-    job_tags: imposter-check, setup-export
+    job_tags: imposter-check, setup-firewall, setup-export, setup-backup
     skip_tags: digitalocean-space, digitalocean-droplet
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"

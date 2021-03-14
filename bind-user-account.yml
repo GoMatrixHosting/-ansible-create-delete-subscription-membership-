@@ -5,10 +5,24 @@
   gather_facts: false
 
   tasks:
+    - name: Include hosting vars
+      include_vars:
+        file: /var/lib/awx/projects/hosting/hosting_vars.yml
+      no_log: True
+
+    - name: Collect AWX admin token the hard way!
+      delegate_to: 127.0.0.1
+      shell: |
+          curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+      register: tower_token
+      no_log: True 
+
     - name: Add user to the appropriate team
-      tower_role:
+      awx.awx.tower_role:
         user: "{{ client_email }}"
         target_team: "{{ member_id }}"
         role: member
         state: present
-
+        tower_host: "https://{{ tower_host }}"
+        tower_oauthtoken: "{{ tower_token.stdout }}"
+        validate_certs: yes

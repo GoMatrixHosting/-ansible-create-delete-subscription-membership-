@@ -62,11 +62,6 @@
     
 # Configure client-list file
 
-- name: Ensure group "webhook" exists
-  group:
-    name: webhook
-    state: present
-
 - name: Touch client-list file, but add/remove some permissions
   file:
     path: '/var/lib/awx/projects/clients/client-list'

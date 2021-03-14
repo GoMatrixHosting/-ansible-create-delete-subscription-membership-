@@ -33,6 +33,18 @@
     validate_certs: yes
   when: matrix_domain is defined
 
+- name: Remove 'Backup Server' job template
+  awx.awx.tower_job_template:
+    name: "{{ matrix_domain }} - 0 - Backup Server"
+    job_type: run
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
 - name: Remove 'Deploy/Update a Server' job template
   awx.awx.tower_job_template:
     name: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
@@ -141,9 +153,9 @@
     validate_certs: yes
   when: matrix_domain is defined
 
-- name: Remove 'Configure Website + Access Backup' job template
+- name: Remove 'Configure Website + Access Export' job template
   awx.awx.tower_job_template:
-    name: "{{ matrix_domain }} - 1 - Configure Website + Access Backup"
+    name: "{{ matrix_domain }} - 1 - Configure Website + Access Export"
     job_type: run
     project: "{{ member_id }} - Matrix Docker Ansible Deploy"
     playbook: setup.yml

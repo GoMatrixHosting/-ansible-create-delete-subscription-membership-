@@ -32,9 +32,10 @@
     msg: "{{ deleted_server_info }}"
   when: do_droplet_id is defined
 
-#- name: Delete fake DNS record for faster testing. :)
+#- name: Delete fake DNS record for faster testing
 #  delegate_to: 127.0.0.1
-#  blockinfile:
-#    path: /etc/hosts
-#    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK {{ matrix_domain }} -->"
-#    block: ""
+#  shell: |
+#    sed -i -c '/{{ matrix_domain }}/d' /etc/hosts
+
+# Doesn't allow letsencrypt to generate certs :S
+
