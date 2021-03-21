@@ -1,5 +1,4 @@
 
-
 - name: Set sub type strings
   set_fact:
     digitalocean_string: 'DigitalOcean'
@@ -61,6 +60,12 @@
     mode: '0700'
     
 # Configure client-list file
+
+- name: Ensure group "webhook" exists
+  group:
+    name: webhook
+    gid: 1000
+    state: present
 
 - name: Touch client-list file, but add/remove some permissions
   file:
@@ -153,5 +158,3 @@
     src: './roles/create-awx-account/templates/extra_vars.json.j2'
     dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json'
     mode: '0600'
-
-
