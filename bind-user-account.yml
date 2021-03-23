@@ -17,7 +17,7 @@
       register: tower_token
       no_log: True 
 
-    - name: Add user to the appropriate team
+    - name: Add enterprise user to the appropriate team
       awx.awx.tower_role:
         user: "{{ client_email }}"
         target_team: "{{ member_id }}"
