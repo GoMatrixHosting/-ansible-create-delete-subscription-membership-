@@ -3,7 +3,7 @@
   awx.awx.tower_job_launch:
     job_template: "{{ item }}"
     extra_vars:
-      matrix_awx_backup_enabled: "skip"
+      matrix_awx_backup_enabled: "skip-survey"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
