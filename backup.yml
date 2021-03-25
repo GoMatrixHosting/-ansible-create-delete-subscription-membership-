@@ -11,7 +11,7 @@
   awx.awx.tower_job_wait:
     job_id: "{{ job.id }}"
     timeout: 3600
-  tower_host: "https://{{ tower_host }}"
-  tower_oauthtoken: "{{ tower_token.stdout }}"
-  validate_certs: yes
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
