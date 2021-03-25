@@ -31,15 +31,15 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-#- name: Allow team to administrate/use this inventory
-#  awx.awx.tower_role:
-#    team: "{{ member_id }}"
-#    inventory: "{{ member_id }}"
-#    role: use
-#    state: present
-#    tower_host: "https://{{ tower_host }}"
-#    tower_oauthtoken: "{{ tower_token.stdout }}"
-#    validate_certs: yes
+- name: Allow team to administrate/use this inventory
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    inventory: "{{ member_id }}"
+    role: use
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
 - name: Add dummyvalue.com host to organisations inventory
   awx.awx.tower_host:
@@ -64,23 +64,33 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-#- name: Add 'AWX SSH Key' credential to users organisation
+- name: Allow team to view the 'AWX SSH Key' credential
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    credential: "{{ member_id }} - AWX SSH Key"
+    role: use
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+#- name: Add 'Unlock Borg Password' credential to users organisation
 #  awx.awx.tower_credential:
-#    name: "{{ member_id }} - AWX SSH Key"
-#    description: "The SSH key for Provision/Deploy"
+#    name: "{{ member_id }} - Unlock Borg Password"
+#    description: "The password to unlock the variable files containing the clients borg repository keys."
 #    organization: "{{ member_id }}"
-#    credential_type: Machine
-#    inputs:
-#      ssh_key_data: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_private.key') }}"
-#      ssh_key_unlock: "{{ client_private_ssh_key_password }}"
+#    credential_type: Vault
+#    inputs: 
+#      vault_id: "{{ member_id }}_unlock_borg_passwords"
+#      vault_password: "{{ unlock_borg_passwords }}"
 #    tower_host: "https://{{ tower_host }}"
 #    tower_oauthtoken: "{{ tower_token.stdout }}"
 #    validate_certs: yes
 
-#- name: Allow team to use 'Unlock Borg Passwords' credential
+#- name: Allow team to use 'Unlock Borg Password' credential
 #  awx.awx.tower_role:
 #    team: "{{ member_id }}"
-#    credential: "Unlock Borg Passwords"
+#    credential: "{{ member_id }} - Unlock Borg Password"
 #    role: use
 #    tower_host: "https://{{ tower_host }}"
 #    tower_oauthtoken: "{{ tower_token.stdout }}"
@@ -101,15 +111,15 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-#- name: Allow team to read 'Ansible Provision Server' project
-#  awx.awx.tower_role:
-#    team: "{{ member_id }}"
-#    project: "{{ member_id }} - Ansible Provision Server"
-#    role: read
-#    state: present
-#    tower_host: "https://{{ tower_host }}"
-#    tower_oauthtoken: "{{ tower_token.stdout }}"
-#    validate_certs: yes
+- name: Allow team to read 'Ansible Provision Server' project
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    project: "{{ member_id }} - Ansible Provision Server"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
 - name: Add 'Spantaleev's Deploy' project to users organisation
   awx.awx.tower_project:
@@ -126,15 +136,15 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-#- name: Allow team to read 'Spantaleev's Deploy' project
-#  awx.awx.tower_role:
-#    team: "{{ member_id }}"
-#    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
-#    role: read
-#    state: present
-#    tower_host: "https://{{ tower_host }}"
-#    tower_oauthtoken: "{{ tower_token.stdout }}"
-#    validate_certs: yes
+- name: Allow team to read 'Spantaleev's Deploy' project
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
 - name: Create 'Provision a New Server' job template
   awx.awx.tower_job_template:
@@ -178,14 +188,14 @@
     validate_certs: yes
   when: subscription_type == 'on_premises'
 
-#- name: Allow team to use 'Provision a New Server' job template
-#  awx.awx.tower_role:
-#    team: "{{ member_id }}"
-#    job_template: "0 - {{ subscription_id }} - Provision a New Server"
-#    role: execute
-#    state: present
-#    tower_host: "https://{{ tower_host }}"
-#    tower_oauthtoken: "{{ tower_token.stdout }}"
-#    validate_certs: yes
+- name: Allow team to use 'Provision a New Server' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "0 - {{ subscription_id }} - Provision a New Server"
+    role: execute
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
 
