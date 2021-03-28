@@ -16,3 +16,4 @@
     line: '{{ deletion_date.stdout }}'
     mode: '0644'
     create: yes
+  ignore_errors: yes
