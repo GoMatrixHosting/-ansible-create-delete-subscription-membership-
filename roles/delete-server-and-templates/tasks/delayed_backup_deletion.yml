@@ -10,7 +10,7 @@
   register: deletion_date
 
 - name: Print deletion date to file
-  delegate_to: '{{ backup_server_hostname }}'
+  delegate_to: '{{ backup_server_ip }}'
   lineinfile:
     path: '{{ backup_server_directory }}/Clients/{{ matrix_domain }}/delete_me'
     line: '{{ deletion_date.stdout }}'
