@@ -11,6 +11,7 @@
 
 - name: Print deletion date to file
   delegate_to: '{{ backup_server_hostname }}'
+  become: '{{ backup_server_user }}'
   lineinfile:
     path: '{{ backup_server_directory }}/Clients/{{ matrix_domain }}/delete_me'
     line: '{{ deletion_date.stdout }}'
