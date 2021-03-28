@@ -12,3 +12,6 @@
 - import_tasks: "{{ role_path }}/tasks/delete_server_directory.yml"
   tags: delete-subscription
 
+# Delayed Backup Deletion
+- import_tasks: "{{ role_path }}/tasks/delayed_backup_deletion.yml"
+  tags: delete-subscription
