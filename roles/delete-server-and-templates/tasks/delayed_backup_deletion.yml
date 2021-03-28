@@ -15,7 +15,7 @@
   lineinfile:
     path: '{{ backup_server_directory }}/Clients/{{ matrix_domain }}/delete_me'
     line: '{{ deletion_date.stdout }}'
-    user: '{{ backup_server_user }}'
+    owner: '{{ backup_server_user }}'
     group: '{{ backup_server_user }}'
     mode: '0644'
     create: yes
