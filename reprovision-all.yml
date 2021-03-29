@@ -23,5 +23,5 @@
       no_log: True 
 
     - name: Execute every job template sequentially
-      include_tasks: provision.yml 
+      include_tasks: reprovision.yml 
       loop: "{{ provision_templates.stdout_lines | flatten(levels=1) }}"
