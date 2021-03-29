@@ -170,7 +170,7 @@
 - name: Create 'Provision a New Server' job template
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - Provision a New Server"
-    description: "Creates digitalocean droplet and space, performs initial setup, adds relevant playbooks to users account."
+    description: "Connects existing server, performs initial setup, adds relevant playbooks to users account."
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
     job_type: run
     inventory: "{{ member_id }}"
