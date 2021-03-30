@@ -14,7 +14,7 @@
     
 - name: Examine if Matrix server has been provisioned before
   stat:
-    path: '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/matrix_vars.json'
+    path: '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/matrix_vars.yml'
   register: matrix_vars_file
       
 - name: Execute every job template sequentially
