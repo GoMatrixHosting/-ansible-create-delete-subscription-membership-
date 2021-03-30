@@ -3,11 +3,11 @@
   set_fact:
     id_array = "{{ item.split(',') }}"
   
-  - debug:
-      msg: 'member_id is: {{ id_array[0] }}'
+- debug:
+    msg: 'member_id is: {{ id_array[0] }}'
 
-  - debug:
-      msg: 'subcription_id is: {{ id_array[1] }}'
+- debug:
+    msg: 'subcription_id is: {{ id_array[1] }}'
       
 - name: Execute every job template sequentially
   awx.awx.tower_job_launch:
