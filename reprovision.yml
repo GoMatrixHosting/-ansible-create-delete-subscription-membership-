@@ -24,7 +24,7 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
   register: job
-  when: not matrix_vars_file.stat.exists
+  when: matrix_vars_file.stat.exists
 
 - name: Wait for job max 900s
   awx.awx.tower_job_wait:
@@ -34,7 +34,7 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   ignore_errors: yes
-  when: not matrix_vars_file.stat.exists
+  when: matrix_vars_file.stat.exists
 
 #Lines passed in like so:
 #
