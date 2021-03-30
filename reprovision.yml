@@ -16,7 +16,7 @@
   awx.awx.tower_job_launch:
     job_template: "0 - {{ id_array.1 }} - Reprovision Server"
     #extra_vars: '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json'
-    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json') }}"
+    #extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json') }}"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
