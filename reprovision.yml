@@ -1,7 +1,18 @@
 
+- name: Collect necessary variables from input
+  set_fact:
+    id_array = "{{ item.split(',') }}"
+  
+  - debug:
+      msg: 'member_id is: {{ id_array[0] }}'
+
+  - debug:
+      msg: 'subcription_id is: {{ id_array[1] }}'
+      
 - name: Execute every job template sequentially
   awx.awx.tower_job_launch:
     job_template: "{{ item }}"
+    extra_vars: '/var/lib/awx/projects/{{ id_array[0] }}/{{ id_array[1] }}/extra_vars.json'
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
@@ -15,4 +26,14 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   ignore_errors: yes
+
+#Lines passed in like so:
+#
+#farmloop.xyz,I-605KYALM74UM
+#null,I-W6ARHG4ABV2G
+#pilotboon.xyz,I-S7VV0TCTXDJC
+
+#extract variable 'matrix_domain' from before comma
+#extract variable 'subscription_id' from after comma
+
 

@@ -7,7 +7,7 @@
   tasks:
     - name: Generate list of backup job templates
       shell: |
-        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | grep subscription_id | sed 's/^  "subscription_id": "/0 - /g' | sed 's/",/ - Reprovision Server/g'
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain,.subscription_id' | sed "N;s/\n/,/"
       register: provision_templates
 
     - name: Include hosting vars
