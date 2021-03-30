@@ -2,7 +2,10 @@
 - name: Collect necessary variables from input
   set_fact:
     id_array = "{{ item.split(',') }}"
-  
+
+- debug:
+    msg: 'array is: {{ id_array }}'
+
 - debug:
     msg: 'member_id is: {{ id_array.0 }}'
 
