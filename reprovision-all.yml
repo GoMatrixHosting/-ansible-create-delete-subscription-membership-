@@ -7,7 +7,7 @@
   tasks:
     - name: Generate list of backup job templates
       shell: |
-        jq -r '[.member_id , .subscription_id] | @csv' /var/lib/awx/projects/clients/*/*/extra_vars.json
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.member_id,.subscription_id' | sed "N;s/\n/,/"
       register: provision_templates
 
     - name: Include hosting vars

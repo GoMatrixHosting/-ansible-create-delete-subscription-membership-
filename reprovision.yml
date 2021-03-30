@@ -1,7 +1,7 @@
 
 - name: Collect necessary variables from input
   set_fact:
-    id_array: "{{ item.split(',')[1:-1] }}"
+    id_array: "{{ item.split(',') }}"
 
 - debug:
     msg: 'array is: {{ id_array }}'
