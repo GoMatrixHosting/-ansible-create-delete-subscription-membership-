@@ -14,14 +14,13 @@
       
 - name: Execute every job template sequentially
   awx.awx.tower_job_launch:
-    job_template: "{{ item }}"
+    job_template: "0 - {{ id_array.1 }} - Reprovision Server"
     #extra_vars: '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json'
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json') }}"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
   register: job
-  when: id_array.0 != "null"
 
 - name: Wait for job max 900s
   awx.awx.tower_job_wait:
@@ -31,7 +30,6 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   ignore_errors: yes
-  when: id_array.0 != "null"
 
 #Lines passed in like so:
 #
