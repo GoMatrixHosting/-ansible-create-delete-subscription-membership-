@@ -14,7 +14,7 @@
       
 - name: Execute every job template sequentially
   awx.awx.tower_job_launch:
-    job_template: "0 - {{ id_array.1 }} - Reprovision Server"
+    job_template: "0 - {{ id_array.1 }} - Provision a New Server"
     #extra_vars: '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json'
     #extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ id_array.0 }}/{{ id_array.1 }}/extra_vars.json') }}"
     tower_host: "https://{{ tower_host }}"
