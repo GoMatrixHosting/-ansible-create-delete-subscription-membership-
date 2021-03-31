@@ -2,15 +2,6 @@
 - name: Collect necessary variables from input
   set_fact:
     id_array: "{{ item.split(',') }}"
-
-- debug:
-    msg: 'array is: {{ id_array }}'
-
-- debug:
-    msg: 'member_id is: {{ id_array.0 }}'
-
-- debug:
-    msg: 'subcription_id is: {{ id_array.1 }}'
     
 - name: Examine if Matrix server has been provisioned before
   stat:
@@ -35,14 +26,4 @@
     validate_certs: yes
   ignore_errors: yes
   when: matrix_vars_file.stat.exists
-
-#Lines passed in like so:
-#
-#farmloop.xyz,I-605KYALM74UM
-#null,I-W6ARHG4ABV2G
-#pilotboon.xyz,I-S7VV0TCTXDJC
-
-#extract variable 'matrix_domain' from before comma
-#extract variable 'subscription_id' from after comma
-
 
