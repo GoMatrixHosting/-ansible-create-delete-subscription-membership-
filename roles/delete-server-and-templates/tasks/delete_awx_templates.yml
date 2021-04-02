@@ -188,6 +188,18 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   when: matrix_domain is defined
+  
+- name: Remove 'Configure Dimension' job template
+  awx.awx.tower_job_template:
+    name: "{{ matrix_domain }} - 1 - Configure Dimension"
+    job_type: run
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
 
 - name: Remove host from organisations inventory
   awx.awx.tower_host:
