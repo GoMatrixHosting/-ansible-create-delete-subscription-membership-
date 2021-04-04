@@ -64,6 +64,38 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
+- name: Allow team to view the 'AWX SSH Key' credential
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    credential: "{{ member_id }} - AWX SSH Key"
+    role: use
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+#- name: Add 'Unlock Borg Password' credential to users organisation
+#  awx.awx.tower_credential:
+#    name: "{{ member_id }} - Unlock Borg Password"
+#    description: "The password to unlock the variable files containing the clients borg repository keys."
+#    organization: "{{ member_id }}"
+#    credential_type: Vault
+#    inputs: 
+#      vault_id: "{{ member_id }}_unlock_borg_passwords"
+#      vault_password: "{{ unlock_borg_passwords }}"
+#    tower_host: "https://{{ tower_host }}"
+#    tower_oauthtoken: "{{ tower_token.stdout }}"
+#    validate_certs: yes
+
+#- name: Allow team to use 'Unlock Borg Password' credential
+#  awx.awx.tower_role:
+#    team: "{{ member_id }}"
+#    credential: "{{ member_id }} - Unlock Borg Password"
+#    role: use
+#    tower_host: "https://{{ tower_host }}"
+#    tower_oauthtoken: "{{ tower_token.stdout }}"
+#    validate_certs: yes
+
 - name: Add 'Ansible Provision Server' project to users organisation
   awx.awx.tower_project:
     name: "{{ member_id }} - Ansible Provision Server"
@@ -138,7 +170,7 @@
 - name: Create 'Provision a New Server' job template
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - Provision a New Server"
-    description: "Creates digitalocean droplet and space, performs initial setup, adds relevant playbooks to users account."
+    description: "Connects existing server, performs initial setup, adds relevant playbooks to users account."
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
     job_type: run
     inventory: "{{ member_id }}"
