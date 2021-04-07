@@ -4,7 +4,13 @@
   shell: |
       curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
   register: tower_token
-  no_log: True
+#  no_log: True
+
+- debug:
+  msg: 'Tower host: {{ tower_host }}'
+
+- debug:
+  msg: 'Tower user: {{ tower_username }}'
 
 - name: Create AWX organisation
   awx.awx.tower_organization:
