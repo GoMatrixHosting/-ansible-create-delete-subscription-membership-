@@ -7,10 +7,10 @@
 #  no_log: True
 
 - debug:
-  msg: 'Tower host: {{ tower_host }}'
+    msg: 'Tower host: {{ tower_host }}'
 
 - debug:
-  msg: 'Tower user: {{ tower_username }}'
+    msg: 'Tower user: {{ tower_username }}'
 
 - name: Create AWX organisation
   awx.awx.tower_organization:
