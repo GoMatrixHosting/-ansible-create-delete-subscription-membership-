@@ -51,6 +51,19 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
+- name: Add backup_server host to organisations inventory
+  awx.awx.tower_host:
+    name: "backup_server"
+    description: "The backup server."
+    inventory: "{{ member_id }}"
+    state: present
+    variables:
+      ansible_host: "{{ backup_server_ip }}"
+      ansible_port: "{{ backup_server_ssh_port }}"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
 - name: Add 'AWX SSH Key' credential to users organisation
   awx.awx.tower_credential:
     name: "{{ member_id }} - AWX SSH Key"
