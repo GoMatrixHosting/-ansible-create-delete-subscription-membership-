@@ -51,10 +51,10 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-- name: Add backup_server host to organisations inventory
+- name: Add 'Backup Server' host to organisations inventory
   awx.awx.tower_host:
-    name: "backup_server"
-    description: "The backup server."
+    name: "Backup Server"
+    description: "The backup server you can use."
     inventory: "{{ member_id }}"
     state: present
     variables:
