@@ -189,7 +189,7 @@
     validate_certs: yes
   when: matrix_domain is defined
 
-- name: Remove 'Purge Media' job template
+- name: Remove 'Purge Media (Advanced)' job template
   awx.awx.tower_job_template:
     name: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     job_type: run
