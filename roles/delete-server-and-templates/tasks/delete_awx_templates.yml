@@ -141,18 +141,6 @@
     validate_certs: yes
   when: matrix_domain is defined
 
-- name: Remove 'Create User' job template
-  awx.awx.tower_job_template:
-    name: "{{ matrix_domain }} - 2 - Create User"
-    job_type: run
-    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
-    playbook: setup.yml
-    state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
-    validate_certs: yes
-  when: matrix_domain is defined
-
 - name: Remove 'Configure Website + Access Export' job template
   awx.awx.tower_job_template:
     name: "{{ matrix_domain }} - 1 - Configure Website + Access Export"
@@ -192,6 +180,18 @@
 - name: Remove 'Configure Dimension' job template
   awx.awx.tower_job_template:
     name: "{{ matrix_domain }} - 1 - Configure Dimension"
+    job_type: run
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Remove 'Purge Media' job template
+  awx.awx.tower_job_template:
+    name: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     job_type: run
     project: "{{ member_id }} - Matrix Docker Ansible Deploy"
     playbook: setup.yml
