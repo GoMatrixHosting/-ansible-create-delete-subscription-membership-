@@ -17,10 +17,10 @@
   register: job
   when: matrix_vars_file.stat.exists
 
-- name: Wait for job max 900s
+- name: Wait for job max 1800s
   awx.awx.tower_job_wait:
     job_id: "{{ job.id }}"
-    timeout: 900
+    timeout: 1800
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
