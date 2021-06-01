@@ -129,6 +129,18 @@
     validate_certs: yes
   when: matrix_domain is defined
 
+- name: Remove 'Configure Element Subdomain' job template
+  awx.awx.tower_job_template:
+    name: "{{ matrix_domain }} - 1 - Configure Element Subdomain"
+    job_type: run
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
 - name: Remove 'Configure Jitsi' job template
   awx.awx.tower_job_template:
     name: "{{ matrix_domain }} - 1 - Configure Jitsi"
