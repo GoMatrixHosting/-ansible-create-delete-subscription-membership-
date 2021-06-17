@@ -76,7 +76,7 @@
   delegate_to: 127.0.0.1
   set_fact:
     ssh_key_id_array: "{{ ssh_key_id_array }} + [ '{{ item.id }}' ]"
-  when: (subscription_type == "digitalocean") and (item.public_key == public_ssh_key)
+  when: item.public_key == public_ssh_key
   loop: "{{ ssh_keys.data|flatten(levels=1) }}"
 
 - debug:
@@ -86,7 +86,7 @@
   delegate_to: 127.0.0.1
   community.digitalocean.digital_ocean_droplet:
     state: present
-    name: 'wireguard.{{ do_droplet_region }}'
+    name: 'wireguard.{{ matrix_domain }}'
     oauth_token: '{{ do_api_token }}'
     size: '{{ slug_size }}'
     ssh_keys: '{{ ssh_key_id_array }}'
