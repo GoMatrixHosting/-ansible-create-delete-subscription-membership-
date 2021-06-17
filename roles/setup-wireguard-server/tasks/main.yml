@@ -1,0 +1,12 @@
+
+# Spawn initial droplet
+- import_tasks: "{{ role_path }}/tasks/spawn_server.yml"
+
+# Perform initial server setup
+- import_tasks: "{{ role_path }}/tasks/setup_server.yml"
+
+# Perform firewall setup
+- import_tasks: "{{ role_path }}/tasks/setup_firewall.yml"
+
+# Configure Wireguard server
+- import_tasks: "{{ role_path }}/tasks/setup_wireguard.yml"
