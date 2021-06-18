@@ -1,0 +1,37 @@
+
+- name: Create folder for the wireguard servers config
+  delegate_to: "{{ server_ip }}"
+  file:
+    path: /etc/wireguard/wg0
+    state: directory
+    mode: '0755'
+
+- name: Create wireguard keys for the server
+  delegate_to: "{{ server_ip }}"
+  command: wg genkey | tee /etc/wireguard/wg0/server-private.key | wg pubkey > /etc/wireguard/wg0/server-public.key
+  args: 
+    creates: /etc/wireguard/wg0/server-private.key
+
+- name: Create wireguard keys for the client
+  delegate_to: "{{ server_ip }}"
+  command: wg genkey | tee /etc/wireguard/wg0/client-private.key | wg pubkey > /etc/wireguard/wg0/client-public.key
+  args: 
+    creates: /etc/wireguard/wg0/client-private.key
+
+/wg0# chmod 600 private.key
+
+- name: alter permission on the wireguard servers key
+  delegate_to: "{{ server_ip }}"
+  file:
+    path: /etc/wireguard/wg0/client-private.key
+    mode: '0600'
+
+- name: alter permission on the wireguard clients key
+  delegate_to: "{{ server_ip }}"
+  file:
+    path: /etc/wireguard/wg0/client-private.key
+    mode: '0600'
+
+
+
+

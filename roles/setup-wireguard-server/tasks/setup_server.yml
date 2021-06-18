@@ -1,7 +1,6 @@
 
-
 - name: Update repositories and all packages on target machine
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   apt:
     name: "*"
     update_cache: yes
@@ -12,36 +11,36 @@
     state: present
 
 - name: Install necessary utils on wireguard server
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - wireguard
     default_release: buster-backports
 
 - name: Create swapfile with the right permissions
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   command: 'fallocate -l {{ swap_size }} /swapfile'
   register: swapfile_new
   args:
     creates: /swapfile
     
 - name: Set correct permissions on swapfile
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   command: 'chmod 600 /swapfile'
   when: swapfile_new.delta is defined
 
 - name: Make swapfile
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   command: 'mkswap /swapfile'
   when: swapfile_new.delta is defined
   
 - name: Make swapfile
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   command: 'swapon /swapfile'
   when: swapfile_new.delta is defined
 
 - name: Make swapfile permanent in /etc/fstab
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   mount: name=none
          src=/swapfile
          fstype=swap
@@ -51,11 +50,11 @@
          state=present
 
 - name: Set swappiness to 20
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   shell: sysctl vm.swappiness=20
 
 - name: Set swappiness to 20 on reboot
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   lineinfile:
     path: /etc/sysctl.conf
     line: vm.swappiness=20
