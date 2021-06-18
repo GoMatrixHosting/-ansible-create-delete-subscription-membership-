@@ -1,6 +1,6 @@
 
 # Spawn initial droplet
-- import_tasks: "{{ role_path }}/tasks/spawn_server.yml"
+- import_tasks: "{{ role_path }}/tasks/connect_server.yml"
 
 # Perform initial server setup
 - import_tasks: "{{ role_path }}/tasks/setup_server.yml"
