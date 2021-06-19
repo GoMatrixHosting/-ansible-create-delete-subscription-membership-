@@ -1,17 +1,4 @@
 
-#- name: Install wg-ifupdown module
-#  delegate_to: "{{ server_ip }}"
-#  copy:
-#    src: "{{ role_path }}/repos/wg-ifupdown.tar.gz"
-#    dest: '/root/wg-ifupdown.tar.gz'
-#    owner: root
-#    group: root
-#    mode: '0644'
-
-#- name: Unpack wg-ifupdown module
-#  delegate_to: "{{ server_ip }}"
-#  command: tar -xzvf /root/wg-ifupdown.tar.gz /wg-ifupdown/
-
 - name: Extract wg-ifupdown.tar.gz into /root
   delegate_to: "{{ server_ip }}"
   unarchive:
@@ -31,13 +18,13 @@
 
 - name: Create wireguard keys for the server
   delegate_to: "{{ server_ip }}"
-  command: wg genkey | tee /etc/wireguard/wg0/server-private.key | wg pubkey > /etc/wireguard/wg0/server-public.key
+  shell: wg genkey | tee /etc/wireguard/wg0/server-private.key | wg pubkey > /etc/wireguard/wg0/server-public.key
   args: 
     creates: /etc/wireguard/wg0/server-private.key
 
 - name: Create wireguard keys for the client
   delegate_to: "{{ server_ip }}"
-  command: wg genkey | tee /etc/wireguard/wg0/client-private.key | wg pubkey > /etc/wireguard/wg0/client-public.key
+  shell: wg genkey | tee /etc/wireguard/wg0/client-private.key | wg pubkey > /etc/wireguard/wg0/client-public.key
   args: 
     creates: /etc/wireguard/wg0/client-private.key
 
