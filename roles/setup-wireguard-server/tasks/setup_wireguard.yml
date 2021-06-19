@@ -50,6 +50,7 @@
   delegate_to: "{{ server_ip }}"
   blockinfile:
     path: /etc/network/interfaces.d/wg0.conf
+    create: yes
     block: |
       auto wg0
       iface wg0 inet static
