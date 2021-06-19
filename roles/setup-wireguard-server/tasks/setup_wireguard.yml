@@ -1,17 +1,23 @@
 
-- name: Install wg-ifupdown module
-  delegate_to: "{{ server_ip }}"
-  copy:
-    src: "{{ role_path }}/repos/wg-ifupdown.tar.gz"
-    dest: '/root/wg-ifupdown.tar.gz'
-    owner: root
-    group: root
-    mode: '0644'
+#- name: Install wg-ifupdown module
+#  delegate_to: "{{ server_ip }}"
+#  copy:
+#    src: "{{ role_path }}/repos/wg-ifupdown.tar.gz"
+#    dest: '/root/wg-ifupdown.tar.gz'
+#    owner: root
+#    group: root
+#    mode: '0644'
 
-- name: Unpack wg-ifupdown module
+#- name: Unpack wg-ifupdown module
+#  delegate_to: "{{ server_ip }}"
+#  command: tar -xzvf /root/wg-ifupdown.tar.gz /wg-ifupdown/
+
+- name: Extract wg-ifupdown.tar.gz into /root
   delegate_to: "{{ server_ip }}"
-  command: tar -xzvf /root/wg-ifupdown.tar.gz /wg-ifupdown/
-  
+  unarchive:
+    src: "{{ role_path }}/repos/wg-ifupdown.tar.gz"
+    dest: /root
+
 - name: Install wg-ifupdown module
   delegate_to: "{{ server_ip }}"
   command: /bin/sh /root/wg-ifupdown/install.sh
