@@ -6,6 +6,7 @@
     update_cache: yes
 
 - name: Add buster-backports repository into sources list
+  delegate_to: "{{ server_ip }}"
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
