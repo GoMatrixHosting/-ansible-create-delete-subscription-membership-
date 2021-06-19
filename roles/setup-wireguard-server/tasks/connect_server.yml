@@ -8,7 +8,6 @@
   delegate_to: "{{ server_ip }}"
   command: echo success
   register: echo_output
-  when: subscription_type == "on_premises"
   
 - debug:
     msg: "{{ echo_output.stdout }}"
