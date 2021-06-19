@@ -1,4 +1,21 @@
 
+- name: Install wg-ifupdown module
+  delegate_to: "{{ server_ip }}"
+  copy:
+    src: "{{ role_path }}/repos/wg-ifupdown.tar.gz"
+    dest: '/root/wg-ifupdown.tar.gz'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Unpack wg-ifupdown module
+  delegate_to: "{{ server_ip }}"
+  command: tar -xzvf /root/wg-ifupdown.tar.gz /root/
+  
+- name: Install wg-ifupdown module
+  delegate_to: "{{ server_ip }}"
+  command: /bin/sh /root/wg-ifupdown/install.sh
+
 - name: Create folder for the wireguard servers config
   delegate_to: "{{ server_ip }}"
   file:
@@ -18,20 +35,77 @@
   args: 
     creates: /etc/wireguard/wg0/client-private.key
 
-/wg0# chmod 600 private.key
-
-- name: alter permission on the wireguard servers key
+- name: Alter permission on the wireguard servers key
   delegate_to: "{{ server_ip }}"
   file:
     path: /etc/wireguard/wg0/client-private.key
     mode: '0600'
 
-- name: alter permission on the wireguard clients key
+- name: Alter permission on the wireguard clients key
   delegate_to: "{{ server_ip }}"
   file:
     path: /etc/wireguard/wg0/client-private.key
     mode: '0600'
 
+- name: Ensure interfaces.d source line exists in interfaces file
+  delegate_to: "{{ server_ip }}"
+  lineinfile:
+    path: /etc/network/interfaces
+    line: 'source /etc/network/interfaces.d/*'
 
+- name: Create wireguard interface entry on server
+  delegate_to: "{{ server_ip }}"
+  blockinfile:
+    path: /etc/network/interfaces.d/wg0.conf
+    block: |
+      auto wg0
+      iface wg0 inet static
+          wg-listen-port 51820
+          address 192.168.99.1/24
+          wg-autoroute no
 
+- name: Record the public SSH key into a variable
+  delegate_to: "{{ server_ip }}"
+  set_fact:
+    client_public_key: "{{ lookup('file', '/etc/wireguard/wg0/client-public.key') }}"
+
+- name: Create wireguard config file on server
+  delegate_to: "{{ server_ip }}"
+  blockinfile:
+    path: /etc/wireguard/wg0/config
+    block: |
+      [Peer]
+      PublicKey = {{ client_public_key }}
+      AllowedIPs = 0.0.0.0/0,::/0
+
+- name: Enable IP forwarding
+  delegate_to: "{{ server_ip }}"
+  blockinfile:
+    path: /ufw/sysctl.conf
+    block: |
+      net/ipv4/ip_forward=1
+      net/ipv6/conf/default/forwarding=1
+      net/ipv6/conf/all/forwarding=1
+
+- name: Enable IP forwarding
+  delegate_to: "{{ server_ip }}"
+  blockinfile:
+    path: /etc/ufw/before.rules
+    block: |
+      # nat Table rules
+      *nat
+      :PREROUTING ACCEPT [0:0]
+      :POSTROUTING ACCEPT [0:0]
+      
+      # flush any previous NAT rules
+      -F
+      
+      # Port Forwardings
+      -A PREROUTING -i eth0 -p tcp --dport 2222 -j DNAT --to-destination 192.168.99.2:22
+      
+      # Forward traffic from wg0 through eth0.
+      -A POSTROUTING -s 192.168.99.2/32 -o eth0 -j MASQUERADE
+      
+      # don't delete the 'COMMIT' line or these nat table rules won't be processed
+      COMMIT
 
