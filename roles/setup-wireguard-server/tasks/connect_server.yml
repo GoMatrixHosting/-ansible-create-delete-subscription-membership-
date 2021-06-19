@@ -13,13 +13,13 @@
     msg: "{{ echo_output.stdout }}"
 
 - name: Disable password authentication
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   lineinfile:
     path: /etc/ssh/sshd_config
     line: 'PasswordAuthentication no'
 
 - name: Restart SSH
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   service:
     name: ssh
     state: restarted
