@@ -10,7 +10,7 @@
 
 - name: Unpack wg-ifupdown module
   delegate_to: "{{ server_ip }}"
-  command: tar -xzvf /root/wg-ifupdown.tar.gz /root/
+  command: tar -xzvf /root/wg-ifupdown.tar.gz /wg-ifupdown/
   
 - name: Install wg-ifupdown module
   delegate_to: "{{ server_ip }}"
