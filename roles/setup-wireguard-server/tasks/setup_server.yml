@@ -18,11 +18,15 @@
      - wireguard
     default_release: buster-backports
 
+- name: Collect kernel version
+  shell: uname -r
+  register: kernel_version
+
 - name: Install Linux headers on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
-     - "linux-headers-{{ ansible_kernel }}"
+     - "linux-headers-{{ kernel_version }}"
 
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"
