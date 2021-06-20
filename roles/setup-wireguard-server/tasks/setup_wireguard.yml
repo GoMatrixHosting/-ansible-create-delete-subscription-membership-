@@ -8,6 +8,8 @@
 - name: Install wg-ifupdown module
   delegate_to: "{{ server_ip }}"
   command: /bin/sh /root/wg-ifupdown/install.sh
+  args:
+    chdir: /root/wg-ifupdown/ifupdown/
 
 - name: Create folder for the wireguard servers config
   delegate_to: "{{ server_ip }}"
@@ -67,6 +69,7 @@
   delegate_to: "{{ server_ip }}"
   blockinfile:
     path: /etc/wireguard/wg0/config
+    create: yes
     block: |
       [Peer]
       PublicKey = {{ client_public_key.stdout }}
