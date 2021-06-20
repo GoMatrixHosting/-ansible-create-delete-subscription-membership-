@@ -84,7 +84,7 @@
       net/ipv6/conf/default/forwarding=1
       net/ipv6/conf/all/forwarding=1
 
-- name: Enable IP forwarding
+- name: Setup UFW before rules
   delegate_to: "{{ server_ip }}"
   blockinfile:
     path: /etc/ufw/before.rules
