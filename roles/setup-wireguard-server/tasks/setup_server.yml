@@ -19,6 +19,7 @@
     default_release: buster-backports
 
 - name: Collect kernel version
+  delegate_to: "{{ server_ip }}"
   shell: uname -r
   register: kernel_version
 
