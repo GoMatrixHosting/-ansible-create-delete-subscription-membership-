@@ -108,6 +108,7 @@
       COMMIT
 
 - name: Reload UFW
+  delegate_to: "{{ server_ip }}"
   ufw:
     state: reloaded
 
