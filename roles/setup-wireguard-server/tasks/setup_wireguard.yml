@@ -60,8 +60,8 @@
 
 - name: Record the public SSH key into a variable
   delegate_to: "{{ server_ip }}"
-  set_fact:
-    client_public_key: "{{ lookup('file', '/etc/wireguard/wg0/client-public.key') }}"
+  shell: cat /etc/wireguard/wg0/client-public.key
+  register: client_public_key
 
 - name: Create wireguard config file on server
   delegate_to: "{{ server_ip }}"
@@ -69,7 +69,7 @@
     path: /etc/wireguard/wg0/config
     block: |
       [Peer]
-      PublicKey = {{ client_public_key }}
+      PublicKey = {{ client_public_key.stdout }}
       AllowedIPs = 0.0.0.0/0,::/0
 
 - name: Enable IP forwarding
