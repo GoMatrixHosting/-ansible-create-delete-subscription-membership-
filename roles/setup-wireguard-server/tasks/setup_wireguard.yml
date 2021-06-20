@@ -9,7 +9,7 @@
   delegate_to: "{{ server_ip }}"
   shell:
     cmd: /bin/sh /root/wg-ifupdown/install.sh
-    chdir: /root/wg-ifupdown/ifupdown/
+    chdir: /root/wg-ifupdown/
 
 - name: Create folder for the wireguard servers config
   delegate_to: "{{ server_ip }}"
