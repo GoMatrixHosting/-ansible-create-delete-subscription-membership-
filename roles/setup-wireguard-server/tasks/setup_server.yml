@@ -27,7 +27,7 @@
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
-     - "linux-headers-{{ kernel_version }}"
+     - "linux-headers-{{ kernel_version.stdout }}"
 
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"
