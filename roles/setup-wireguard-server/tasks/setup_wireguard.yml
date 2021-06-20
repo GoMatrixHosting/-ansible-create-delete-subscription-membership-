@@ -78,7 +78,7 @@
 - name: Enable IP forwarding
   delegate_to: "{{ server_ip }}"
   blockinfile:
-    path: /ufw/sysctl.conf
+    path: /etc/ufw/sysctl.conf
     block: |
       net/ipv4/ip_forward=1
       net/ipv6/conf/default/forwarding=1
