@@ -7,8 +7,8 @@
 
 - name: Install wg-ifupdown module
   delegate_to: "{{ server_ip }}"
-  command: /bin/sh /root/wg-ifupdown/install.sh
-  args:
+  shell:
+    cmd: /bin/sh /root/wg-ifupdown/install.sh
     chdir: /root/wg-ifupdown/ifupdown/
 
 - name: Create folder for the wireguard servers config
