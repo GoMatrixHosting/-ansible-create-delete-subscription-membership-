@@ -18,6 +18,12 @@
      - wireguard
     default_release: buster-backports
 
+- name: Install Linux headers on wireguard server
+  delegate_to: "{{ server_ip }}"
+  apt:
+    pkg:
+     - "linux-headers-{{ ansible_kernel }}"
+
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"
   command: 'fallocate -l {{ swap_size }} /swapfile'
