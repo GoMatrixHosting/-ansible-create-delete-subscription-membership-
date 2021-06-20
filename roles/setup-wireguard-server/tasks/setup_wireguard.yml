@@ -33,7 +33,7 @@
 - name: Alter permission on the wireguard servers key
   delegate_to: "{{ server_ip }}"
   file:
-    path: /etc/wireguard/wg0/client-private.key
+    path: /etc/wireguard/wg0/server-private.key
     mode: '0600'
 
 - name: Alter permission on the wireguard clients key
@@ -56,6 +56,7 @@
     block: |
       auto wg0
       iface wg0 inet static
+          wg-private-key /etc/wireguard/wg0/server-private.key
           wg-listen-port 51820
           address 192.168.99.1/24
           wg-autoroute no
