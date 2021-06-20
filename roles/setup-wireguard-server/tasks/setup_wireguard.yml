@@ -107,3 +107,11 @@
       # don't delete the 'COMMIT' line or these nat table rules won't be processed
       COMMIT
 
+- name: Probe Wireguard kernel module
+  delegate_to: "{{ server_ip }}"
+  shell: modprobe wireguard
+  
+- name: Bring Wireguard interface up
+  delegate_to: "{{ server_ip }}"
+  shell: ifdown wg0; ifup wg0
+
