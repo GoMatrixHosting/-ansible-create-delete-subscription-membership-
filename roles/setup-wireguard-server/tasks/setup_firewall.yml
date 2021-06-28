@@ -41,7 +41,7 @@
     proto: tcp
 
 - name: Allow all access to TCP/UDP port 3478 for TURN
-  delegate_to: "{{ server_ip_final }}"
+  delegate_to: "{{ server_ip }}"
   ufw:
     rule: allow
     port: '3478'
