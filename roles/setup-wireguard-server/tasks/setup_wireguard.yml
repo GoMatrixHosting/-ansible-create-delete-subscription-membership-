@@ -126,12 +126,4 @@
   delegate_to: "{{ server_ip }}"
   reboot:
     reboot_timeout: 300
-
-#- name: Bring Wireguard interface up
-#  delegate_to: "{{ server_ip }}"
-#  shell: ifdown wg0; ifup wg0
-
-#- name: Probe Wireguard kernel module
-#  delegate_to: "{{ server_ip }}"
-#  shell: modprobe wireguard
   
