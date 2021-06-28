@@ -10,7 +10,7 @@
   ufw:
     rule: allow
     port: '51820'
-    proto: tcp
+    proto: udp
 
 - name: Allow all access to TCP port 2222 for Wireguard Clients SSH
   delegate_to: "{{ server_ip }}"

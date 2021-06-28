@@ -75,7 +75,6 @@
       [Peer]
       PublicKey = {{ client_public_key.stdout }}
       AllowedIPs = 192.168.99.2/32
-#      AllowedIPs = 0.0.0.0/0,::/0
 
 - name: Enable IP forwarding
   delegate_to: "{{ server_ip }}"
