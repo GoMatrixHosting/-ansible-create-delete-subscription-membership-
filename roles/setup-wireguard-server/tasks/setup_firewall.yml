@@ -40,6 +40,13 @@
     port: '443'
     proto: tcp
 
+- name: Allow all access to TCP/UDP port 3478 for TURN
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '3478'
+    proto: any
+
 - name: Allow all access to TCP/UDP port 5349 for TURN
   delegate_to: "{{ server_ip }}"
   ufw:
@@ -82,7 +89,7 @@
     port: '587'
     proto: tcp
 
-- name: Allow all access to TCP port 9100 for Synapse metrics
+- name: Allow all access to TCP port 9000 for Synapse metrics
   delegate_to: "{{ server_ip }}"
   ufw:
     rule: allow
