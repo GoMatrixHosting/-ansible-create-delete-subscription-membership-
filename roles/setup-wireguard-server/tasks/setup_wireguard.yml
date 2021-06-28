@@ -80,6 +80,7 @@
   delegate_to: "{{ server_ip }}"
   blockinfile:
     path: /etc/ufw/sysctl.conf
+    insertafter: "# Uncomment this to allow this host to route packets between interfaces"
     block: |
       net/ipv4/ip_forward=1
       net/ipv6/conf/default/forwarding=1
@@ -112,11 +113,15 @@
   ufw:
     state: reloaded
 
-- name: Bring Wireguard interface up
-  delegate_to: "{{ server_ip }}"
-  shell: ifdown wg0; ifup wg0
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 300
 
-- name: Probe Wireguard kernel module
-  delegate_to: "{{ server_ip }}"
-  shell: modprobe wireguard
+#- name: Bring Wireguard interface up
+#  delegate_to: "{{ server_ip }}"
+#  shell: ifdown wg0; ifup wg0
+
+#- name: Probe Wireguard kernel module
+#  delegate_to: "{{ server_ip }}"
+#  shell: modprobe wireguard
   
