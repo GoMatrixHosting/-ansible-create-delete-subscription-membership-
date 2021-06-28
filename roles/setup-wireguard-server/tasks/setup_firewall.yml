@@ -102,7 +102,95 @@
     rule: allow
     port: '9100'
     proto: tcp
-    
+
+- name: Allow all access to TCP port 18111 with UFW for generic worker
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '18111'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 19111 with UFW for generic worker metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19111'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 19200 with UFW for pusher worker metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19200'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 19300 with UFW for appservice worker metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19300'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 19400 with UFW for federation sender metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19400'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 18551 with UFW for media repo worker
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '18551'
+    proto: tcp
+  when: plan_size == "jumbo"
+
+- name: Allow all access to TCP port 19551 with UFW for media repo worker metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19551'
+    proto: tcp
+  when: plan_size == "jumbo"
+ 
+- name: Allow all access to TCP port 18661 with UFW for user dir worker
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '18661'
+    proto: tcp
+  when: plan_size == "jumbo"
+  
+- name: Allow all access to TCP port 19661 with UFW for user dir worker metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19661'
+    proto: tcp
+  when: plan_size == "jumbo"
+  
+- name: Allow all access to TCP port 18771 with UFW for frontend proxy
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '18771'
+    proto: tcp
+  when: plan_size == "jumbo"
+  
+- name: Allow all access to TCP port 19771 with UFW for frontend proxy metrics
+  delegate_to: "{{ server_ip_final }}"
+  ufw:
+    rule: allow
+    port: '19771'
+    proto: tcp
+  when: plan_size == "jumbo"
+
 - name: Default allow outgoing traffic with UFW
   delegate_to: "{{ server_ip }}"
   ufw:
