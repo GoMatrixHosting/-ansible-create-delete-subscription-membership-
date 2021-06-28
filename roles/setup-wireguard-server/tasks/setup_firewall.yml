@@ -108,6 +108,13 @@
     policy: deny
     direction: incoming
 
+- name: Default allow forwarding traffic with UFW
+  delegate_to: "{{ server_ip }}"
+  ufw:
+    policy: allow
+    route: yes
+    direction: routed
+
 - name: Enable UFW
   delegate_to: "{{ server_ip }}"
   ufw:
