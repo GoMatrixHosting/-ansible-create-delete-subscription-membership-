@@ -38,6 +38,8 @@
 #  no_log: True
 
 - name: Add wireguard host to organisations inventory
+  delegate_to: 127.0.0.1
+  connection: local
   awx.awx.tower_host:
     name: "wireguard.{{ matrix_domain }}"
     description: "{{ matrix_domain }} Wireguard Proxy"
