@@ -108,8 +108,6 @@
       # 4443/tcp (Jitsi Harvester fallback)
       # 8448/tcp matrix federation
       -A PREROUTING -i eth0 -p udp -m multiport --dports 3478,5349,10000,49152:49172 -j DNAT --to-destination 192.168.99.2:22
-      # 4445/udp ???
-      # 4446/udp ???
       # 10000/udp (Jitsi video RTP)
       # 49152-49172/udp (TURN over UDP)
       
