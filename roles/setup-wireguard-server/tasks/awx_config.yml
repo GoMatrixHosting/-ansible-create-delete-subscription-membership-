@@ -4,6 +4,10 @@
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
   no_log: True
 
+- name: Include organisation variables from organisation.yml
+  include_vars:
+    file: /var/lib/awx/projects/clients/{{ member_id }}/organisation.yml
+
 - name: Collect AWX admin token the hard way!
   delegate_to: 127.0.0.1
   connection: local
