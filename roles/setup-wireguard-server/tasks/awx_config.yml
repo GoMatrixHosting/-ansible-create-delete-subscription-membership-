@@ -24,20 +24,14 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-- name: Save new 'Configure Element' survey.json to the AWX tower, template
+- name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
   delegate_to: 127.0.0.1
   connection: local
   template:
     src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
     dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
 
-- name: Copy new 'Configure Element' survey.json to target machine
-  delegate_to: 127.0.0.1
-  connection: local
-  copy:
-    src: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
-    dest: '/matrix/awx/setup_wireguard_server.json'
-    mode: '0660'
+# No access to host yet to save this remotely
 
 - name: Create '0 - {{ subscription_id }} - Provision Wireguard Server' job template
   delegate_to: 127.0.0.1
