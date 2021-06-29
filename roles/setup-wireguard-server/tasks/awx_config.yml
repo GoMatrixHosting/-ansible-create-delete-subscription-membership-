@@ -28,7 +28,7 @@
   delegate_to: 127.0.0.1
   connection: local
   template:
-    src: 'roles/matrix-awx/surveys/setup_wireguard_server.json.j2'
+    src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
     dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
 
 - name: Copy new 'Configure Element' survey.json to target machine
