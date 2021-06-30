@@ -71,7 +71,7 @@
       "default": "22",
       "choices": "",
       "new_question": true,
-      "variable": "ansible_port",
+      "variable": "server_ssh_port",
       "type": "text"
     }
   ]
