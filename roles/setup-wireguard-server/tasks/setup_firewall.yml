@@ -12,14 +12,14 @@
     port: '51820'
     proto: udp
 
-- name: Allow all access to TCP port 2222 for Wireguard Clients SSH
+- name: Allow all access to TCP port 2222 for SSH
   delegate_to: "{{ server_ip }}"
   ufw:
     rule: allow
     port: '2222'
     proto: tcp
 
-- name: Allow all access to TCP port 22 for SSH
+- name: Allow all access to TCP port 22 for Wireguard Clients SSH
   delegate_to: "{{ server_ip }}"
   ufw:
     rule: allow

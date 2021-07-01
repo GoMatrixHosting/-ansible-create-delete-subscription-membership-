@@ -22,7 +22,7 @@
     state: present
     variables:
       ansible_host: "{{ server_ip }}"
-      ansible_port: "22"
+      ansible_port: "2222"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
@@ -33,6 +33,20 @@
   template:
     src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
     dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
+
+- name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
+  delegate_to: 127.0.0.1
+  connection: local
+  template:
+    src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
+    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
+
+- name: Copy wireguard templates extra_vars to the AWX tower
+  delegate_to: 127.0.0.1
+  connection: local
+  copy:
+    src: '{{ role_path }}/extra_vars/wireguard_vars.json'
+    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json'
 
 # No access to host yet to save this remotely
 
@@ -47,6 +61,7 @@
     credential: "{{ member_id }} - AWX SSH Key"
     project: "Ansible Create Delete Subscription Membership"
     playbook: setup_wireguard_server.yml
+    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json') }}"
     survey_enabled: true
     survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json') }}"
     state: present
@@ -55,7 +70,7 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-- name: Allow team to view 'Export Server' job template
+- name: Allow team to view 'Provision Wireguard Server' job template
   delegate_to: 127.0.0.1
   connection: local
   awx.awx.tower_role:

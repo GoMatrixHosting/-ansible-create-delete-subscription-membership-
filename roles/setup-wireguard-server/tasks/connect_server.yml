@@ -4,7 +4,7 @@
   set_fact:
     swap_size: "1G"
 
-- name: Test if SSH is possible with ipv4
+- name: Test if SSH is possible
   delegate_to: "{{ server_ip }}"
   command: echo success
   register: echo_output
@@ -18,8 +18,9 @@
     path: /etc/ssh/sshd_config
     line: 'PasswordAuthentication no'
 
-- name: Restart SSH
+- name: Change SSH port for wireguard server
   delegate_to: "{{ server_ip }}"
-  service:
-    name: ssh
-    state: restarted
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: 'SSH 2222'
+
