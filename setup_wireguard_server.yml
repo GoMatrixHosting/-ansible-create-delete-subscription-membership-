@@ -1,0 +1,8 @@
+
+- name: "Configures a wireguard server AWX can use to SSH into an on-premises server."
+  hosts: localhost
+#  connection: local
+  gather_facts: false
+
+  roles:
+    - setup-wireguard-server

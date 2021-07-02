@@ -1,0 +1,83 @@
+    
+- name: Include hosting vars of digital_ocean.yml
+  include_vars:
+    file: /var/lib/awx/projects/hosting/hosting_vars.yml
+  no_log: True
+
+- name: Collect AWX admin token the hard way!
+  delegate_to: 127.0.0.1
+  connection: local
+  shell: |
+      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+  register: tower_token
+  no_log: True
+
+- name: Add wireguard host to organisations inventory
+  delegate_to: 127.0.0.1
+  connection: local
+  awx.awx.tower_host:
+    name: "wireguard.{{ matrix_domain }}"
+    description: "{{ matrix_domain }} Wireguard Proxy"
+    inventory: "{{ member_id }}"
+    state: present
+    variables:
+      ansible_host: "{{ server_ip }}"
+      ansible_port: "2222"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+- name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
+  delegate_to: 127.0.0.1
+  connection: local
+  template:
+    src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
+    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
+
+- name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
+  delegate_to: 127.0.0.1
+  connection: local
+  template:
+    src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
+    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
+
+- name: Copy wireguard templates extra_vars to the AWX tower
+  delegate_to: 127.0.0.1
+  connection: local
+  copy:
+    src: '{{ role_path }}/extra-vars/wireguard_vars.json'
+    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json'
+
+# No access to host yet to save this remotely
+
+- name: Create '0 - {{ subscription_id }} - Provision Wireguard Server' job template
+  delegate_to: 127.0.0.1
+  connection: local
+  awx.awx.tower_job_template:
+    name: "0 - {{ subscription_id }} - Provision Wireguard Server"
+    description: "Configures a wireguard server AWX can use to SSH into an on-premises server."
+    job_type: run
+    inventory: "{{ member_id }}"
+    credential: "{{ member_id }} - AWX SSH Key"
+    project: "Ansible Create Delete Subscription Membership"
+    playbook: setup_wireguard_server.yml
+    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json') }}"
+    survey_enabled: true
+    survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json') }}"
+    state: present
+    verbosity: 1
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+- name: Allow team to view 'Provision Wireguard Server' job template
+  delegate_to: 127.0.0.1
+  connection: local
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "0 - {{ subscription_id }} - Provision Wireguard Server"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes

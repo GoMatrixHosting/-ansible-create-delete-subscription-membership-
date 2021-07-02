@@ -1,0 +1,15 @@
+
+# Connect a wireguard server
+- import_tasks: "{{ role_path }}/tasks/connect_server.yml"
+
+# Connect the server to AWX
+- import_tasks: "{{ role_path }}/tasks/awx_config.yml"
+
+# Perform initial server setup
+- import_tasks: "{{ role_path }}/tasks/setup_server.yml"
+
+# Perform firewall setup
+- import_tasks: "{{ role_path }}/tasks/setup_firewall.yml"
+
+# Configure Wireguard server
+- import_tasks: "{{ role_path }}/tasks/setup_wireguard.yml"

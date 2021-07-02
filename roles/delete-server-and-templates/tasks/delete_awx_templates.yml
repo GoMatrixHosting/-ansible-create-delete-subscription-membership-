@@ -23,6 +23,17 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
+- name: Remove 'Provision Wireguard Server' job template
+  awx.awx.tower_job_template:
+    name: "0 - {{ subscription_id }} - Provision Wireguard Server"
+    job_type: run
+    project: "Ansible Create Delete Subscription Membership"
+    playbook: setup_wireguard_server.yml
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
 - name: Remove schedule for 'Deploy a New Server' job template
   awx.awx.tower_schedule:
     name: "{{ matrix_domain }} - 0 - Update Server Schedule"
@@ -273,7 +284,7 @@
     validate_certs: yes
   when: matrix_domain is defined
   
-- name: Remove host from organisations inventory
+- name: Remove Matrix server from organisations inventory
   awx.awx.tower_host:
     name: "matrix.{{ matrix_domain }}"
     description: "{{ matrix_domain }} Matrix Server"
@@ -282,5 +293,14 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
-  when: matrix_domain is defined
+  
+- name: Remove Wireguard Server from organisations inventory
+  awx.awx.tower_host:
+    name: "wireguard.{{ matrix_domain }}"
+    description: "{{ matrix_domain }} Wireguard Proxy"
+    inventory: "{{ member_id }}"
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
 
