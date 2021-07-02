@@ -100,14 +100,13 @@
       -F
       
       # Port Forwardings
-      -A PREROUTING -i eth0 -p tcp --dport 22 -j DNAT --to-destination 192.168.99.2:22
-      -A PREROUTING -i eth0 -p tcp -m multiport --dports 25,80,443,587,3478,5349,4443,8448,9000,9100 -j DNAT --to-destination 192.168.99.2:22
+      -A PREROUTING -i eth0 -p tcp -m multiport --dports 22,25,80,443,587,3478,5349,4443,8448,9000,9100 -j DNAT --to-destination 192.168.99.2
       # 3478/tcp+udp TURN + 5349/tcp+udp TURN-SSL (RFC-5766)
       # 25/tcp and 587/tcp for SMTP
       # 9000/tcp for Synapse metrics + 9100/tcp for Node-Exporter metrics
       # 4443/tcp (Jitsi Harvester fallback)
       # 8448/tcp matrix federation
-      -A PREROUTING -i eth0 -p udp -m multiport --dports 3478,5349,10000,49152:49172 -j DNAT --to-destination 192.168.99.2:22
+      -A PREROUTING -i eth0 -p udp -m multiport --dports 3478,5349,10000,49152:49172 -j DNAT --to-destination 192.168.99.2
       # 10000/udp (Jitsi video RTP)
       # 49152-49172/udp (TURN over UDP)
       
@@ -132,14 +131,13 @@
       -F
       
       # Port Forwardings
-      -A PREROUTING -i eth0 -p tcp --dport 22 -j DNAT --to-destination 192.168.99.2:22
-      -A PREROUTING -i eth0 -p tcp -m multiport --dports 25,80,443,587,3478,5349,4443,8448,9000,9100,18111,19111,19200,19300,19400,18551,19551,18661,19661,18771,19771 -j DNAT --to-destination 192.168.99.2:22
+      -A PREROUTING -i eth0 -p tcp -m multiport --dports 22,25,80,443,587,3478,5349,4443,8448,9000,9100,18111,19111,19200,19300,19400,18551,19551,18661,19661,18771,19771 -j DNAT --to-destination 192.168.99.2
       # 3478/tcp+udp TURN + 5349/tcp+udp TURN-SSL (RFC-5766)
       # 25/tcp and 587/tcp for SMTP
       # 9000/tcp for Synapse metrics + 9100/tcp for Node-Exporter metrics
       # 4443/tcp (Jitsi Harvester fallback)
       # 8448/tcp matrix federation
-      -A PREROUTING -i eth0 -p udp -m multiport --dports 3478,5349,10000,49152:49172 -j DNAT --to-destination 192.168.99.2:22
+      -A PREROUTING -i eth0 -p udp -m multiport --dports 3478,5349,10000,49152:49172 -j DNAT --to-destination 192.168.99.2
       # 10000/udp (Jitsi video RTP)
       # 49152-49172/udp (TURN over UDP)
       
