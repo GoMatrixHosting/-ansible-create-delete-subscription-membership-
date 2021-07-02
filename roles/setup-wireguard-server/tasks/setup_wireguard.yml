@@ -155,7 +155,8 @@
   ufw:
     state: reloaded
 
-- name: Reboot a slow machine that might have lots of updates to apply
+- name: Reboot server to fix wireguard
   delegate_to: "{{ server_ip }}"
   reboot:
-
+    reboot_timeout: 5
+  ignore_errors: yes
