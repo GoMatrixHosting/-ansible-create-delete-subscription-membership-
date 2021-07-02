@@ -22,5 +22,5 @@
   delegate_to: "{{ server_ip }}"
   lineinfile:
     path: /etc/ssh/sshd_config
-    line: 'SSH 2222'
+    line: 'Port 2222'
 
