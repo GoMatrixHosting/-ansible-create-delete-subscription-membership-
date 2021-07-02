@@ -158,5 +158,4 @@
 - name: Reboot a slow machine that might have lots of updates to apply
   delegate_to: "{{ server_ip }}"
   reboot:
-    reboot_timeout: 300
-  
+
