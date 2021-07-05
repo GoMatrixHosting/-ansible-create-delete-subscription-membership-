@@ -5,6 +5,11 @@
     name: "*"
     update_cache: yes
 
+- name: Update all packages to their latest version
+  apt:
+    name: "*"
+    state: latest
+
 - name: Add buster-backports repository into sources list
   delegate_to: "{{ server_ip }}"
   apt_repository:
