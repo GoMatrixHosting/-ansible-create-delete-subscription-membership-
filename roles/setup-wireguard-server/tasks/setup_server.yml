@@ -6,6 +6,7 @@
     update_cache: yes
 
 - name: Update all packages to their latest version
+  delegate_to: "{{ server_ip }}"
   apt:
     name: "*"
     state: latest
