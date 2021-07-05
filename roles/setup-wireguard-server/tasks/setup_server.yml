@@ -28,6 +28,7 @@
   apt:
     pkg:
      - "linux-headers-{{ kernel_version.stdout }}"
+  ignore_errors: True
 
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"
