@@ -5,6 +5,7 @@
 
 # Delete AWX account
 - import_tasks: "{{ role_path }}/tasks/delete_awx_account.yml"
+  when: not org_files_result.stat.exists
   tags: delete-membership
 
 # Delete organisation directories
