@@ -29,12 +29,29 @@
   shell: uname -r
   register: kernel_version
 
-- name: Install Linux headers on wireguard server
+- name: Install Linux headers and other packages on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
+     - prometheus-node-exporter
      - "linux-headers-{{ kernel_version.stdout }}"
   ignore_errors: True
+
+- name: Adjust service file for Node Exporter
+  delegate_to: "{{ server_ip }}"
+  lineinfile:
+    path: /lib/systemd/system/prometheus-node-exporter.service
+    regexp: '^EnvironmentFile=\/etc\/default\/prometheus-node-exporter.*$'
+    line: 'EnvironmentFile=/etc/default/prometheus-node-exporter --web.listen-address=":9200"'
+    owner: root
+    group: root
+    mode: '0644' 
+
+- name: Restart service prometheus-node-exporter, in all cases
+  delegate_to: "{{ server_ip }}"
+  service:
+    name: prometheus-node-exporter
+    state: restarted
 
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"
