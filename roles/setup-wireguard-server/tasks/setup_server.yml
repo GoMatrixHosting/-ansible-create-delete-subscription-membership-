@@ -5,6 +5,12 @@
     name: "*"
     update_cache: yes
 
+- name: Update all packages to their latest version
+  delegate_to: "{{ server_ip }}"
+  apt:
+    name: "*"
+    state: latest
+
 - name: Add buster-backports repository into sources list
   delegate_to: "{{ server_ip }}"
   apt_repository:
@@ -28,6 +34,7 @@
   apt:
     pkg:
      - "linux-headers-{{ kernel_version.stdout }}"
+  ignore_errors: True
 
 - name: Create swapfile with the right permissions
   delegate_to: "{{ server_ip }}"

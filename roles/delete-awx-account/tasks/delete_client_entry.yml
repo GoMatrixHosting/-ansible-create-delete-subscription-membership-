@@ -1,0 +1,14 @@
+
+- name: Ensure group "webhook" exists
+  group:
+    name: webhook
+    state: present
+    
+- name: Remove members entry from client-list file
+  lineinfile:
+    dest: '/var/lib/awx/projects/clients/client-list'
+    regexp: '^{{ member_id }},.*\n'
+    mode: '0660'
+    owner: root
+    group: webhook
+    state: absent

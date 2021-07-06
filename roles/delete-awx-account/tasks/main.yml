@@ -3,6 +3,10 @@
 - import_tasks: "{{ role_path }}/tasks/load_variables.yml"
   tags: delete-membership
 
+# Delete client-list file entry
+- import_tasks: "{{ role_path }}/tasks/delete_client_entry.yml"
+  tags: delete-membership
+
 # Delete AWX account
 - import_tasks: "{{ role_path }}/tasks/delete_awx_account.yml"
   tags: delete-membership

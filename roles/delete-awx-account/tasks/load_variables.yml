@@ -5,5 +5,8 @@
   no_log: True
 
 - name: Include organisation variables from organisation.yml
-  include_vars:
-    file: /var/lib/awx/projects/clients/{{ member_id }}/organisation.yml
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - /var/lib/awx/projects/clients/{{ member_id }}/organisation.yml
+      skip: true
