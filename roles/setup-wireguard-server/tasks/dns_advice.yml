@@ -1,5 +1,5 @@
 
-- name:
+- name: Calculate spaces for printing DNS records
   delegate_to: 127.0.0.1
   command: |
     perl -e 'print " " x (24 - length( '{{ matrix_domain }}' ))';
