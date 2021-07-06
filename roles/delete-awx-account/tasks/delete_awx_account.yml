@@ -47,6 +47,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  when: client_email is defined
 
 - name: Delete AWX user
   awx.awx.tower_user:
@@ -56,6 +57,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  when: client_email is defined
 
 - name: Delete AWX team
   awx.awx.tower_team:
@@ -74,5 +76,6 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  when: client_email is defined
   register: awxorg
 
