@@ -26,7 +26,7 @@
     validate_certs: yes
   ignore_errors: True
 
-- name: Remove 'Spantaleev's Deploy' project to users organisation
+- name: Remove 'Spantaleev's Deploy' project from users organisation
   awx.awx.tower_project:
     name: "{{ member_id }} - Matrix Docker Ansible Deploy"
     description: "Creating and updating a Matrix service on an already provisioned server."
@@ -38,6 +38,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  ignore_errors: True
 
 - name: Delete AWX user from team
   awx.awx.tower_role:
