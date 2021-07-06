@@ -4,11 +4,6 @@
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
   no_log: True
 
-- name: Check if organisation.yml exists
-  stat:
-    path: /var/lib/awx/projects/clients/{{ member_id }}/organisation.yml
-  register: org_files_result
-
 - name: Include organisation variables from organisation.yml
   include_vars: "{{ item }}"
   with_first_found:
