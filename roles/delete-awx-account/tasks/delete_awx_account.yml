@@ -12,7 +12,7 @@
   register: tower_token
   no_log: True
 
-- name: Remove 'Ansible Provision Server' project to users organisation
+- name: Remove 'Ansible Provision Server' project from users organisation
   awx.awx.tower_project:
     name: "{{ member_id }} - Ansible Provision Server"
     description: "Creates digitalocean droplet and space, performs initial setup, adds relevant playbooks to users account."
@@ -24,6 +24,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  ignore_errors: True
 
 - name: Remove 'Spantaleev's Deploy' project to users organisation
   awx.awx.tower_project:
