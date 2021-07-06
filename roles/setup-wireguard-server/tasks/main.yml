@@ -13,3 +13,6 @@
 
 # Configure Wireguard server
 - import_tasks: "{{ role_path }}/tasks/setup_wireguard.yml"
+
+# Print DNS advice
+- import_tasks: "{{ role_path }}/tasks/dns_advice.yml"
