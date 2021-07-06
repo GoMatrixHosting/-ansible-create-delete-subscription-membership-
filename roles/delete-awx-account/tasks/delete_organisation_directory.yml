@@ -1,4 +1,4 @@
     
 - name: Delete the organisations directory on AWX
   shell: "rm -r /var/lib/awx/projects/clients/{{ member_id }}"
-
+  ignore_errors: True

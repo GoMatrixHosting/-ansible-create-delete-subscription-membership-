@@ -81,4 +81,3 @@
     validate_certs: yes
   when: client_email is defined
   register: awxorg
-
