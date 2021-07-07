@@ -50,6 +50,7 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   when: client_email is defined
+  ignore_errors: True
 
 - name: Delete AWX user
   awx.awx.tower_user:

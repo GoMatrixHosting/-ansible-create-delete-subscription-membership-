@@ -11,4 +11,4 @@
     - Your Wireguard server has been created. We recommend that you configure your DNS to have the 
     - "following records:"
     - Type    Host                              Target
-    - A       wireguard.{{ matrix_domain }}{{ dns_spaces.stdout }}{{ server_ip }}
+    - A/AAAA  wireguard.{{ matrix_domain }}{{ dns_spaces.stdout }}{{ server_ip }}
