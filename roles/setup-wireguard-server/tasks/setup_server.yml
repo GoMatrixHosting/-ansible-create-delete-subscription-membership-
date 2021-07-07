@@ -51,25 +51,25 @@
   delegate_to: "{{ server_ip }}"
   lineinfile:
     path: /etc/default/prometheus-node-exporter
-    line: '  --web.listen-address=":9100"'
+    line: '  --web.listen-address=":9200"'
     owner: root
     group: root
     mode: '0644'
 
-- name: Adjust service file for Node Exporter
-  delegate_to: "{{ server_ip }}"
-  lineinfile:
-    path: /lib/systemd/system/prometheus-node-exporter.service
-    insertafter: '^Restart=always$'
-    line: 'RestartSec=30'
-    owner: root
-    group: root
-    mode: '0644'
+#- name: Adjust service file for Node Exporter
+#  delegate_to: "{{ server_ip }}"
+#  lineinfile:
+#    path: /lib/systemd/system/prometheus-node-exporter.service
+#    insertafter: '^Restart=always$'
+#    line: 'RestartSec=30'
+#    owner: root
+#    group: root
+#    mode: '0644'
 
-- name: Just force systemd daemon-reload
-  delegate_to: "{{ server_ip }}"
-  systemd:
-    daemon_reload: yes
+#- name: Just force systemd daemon-reload
+#  delegate_to: "{{ server_ip }}"
+#  systemd:
+#    daemon_reload: yes
 
 - name: Restart service prometheus-node-exporter, in all cases
   delegate_to: "{{ server_ip }}"
