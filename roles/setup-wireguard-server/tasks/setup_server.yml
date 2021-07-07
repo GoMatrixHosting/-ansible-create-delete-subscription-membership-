@@ -47,6 +47,16 @@
     group: root
     mode: '0644' 
 
+- name: Adjust service file for Node Exporter
+  delegate_to: "{{ server_ip }}"
+  lineinfile:
+    path: /lib/systemd/system/prometheus-node-exporter.service
+    insertafter: '^Restart=always$'
+    line: 'RestartSec=30'
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Restart service prometheus-node-exporter, in all cases
   delegate_to: "{{ server_ip }}"
   service:
