@@ -41,7 +41,8 @@
   delegate_to: "{{ server_ip }}"
   lineinfile:
     path: /etc/default/prometheus-node-exporter
-    line: '  --web.listen-address=":9200"'
+    regexp: "^ARGS=.*$"
+    line: "ARGS='--web.listen-address=\":9200\"'"
     owner: root
     group: root
     mode: '0644'
