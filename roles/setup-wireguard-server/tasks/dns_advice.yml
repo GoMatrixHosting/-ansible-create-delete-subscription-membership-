@@ -3,7 +3,7 @@
   delegate_to: 127.0.0.1
   connection: local
   command: |
-    perl -e 'print " " x (24 - length( '{{ matrix_domain }}' ))';
+    perl -e 'print " " x (23 - length( '{{ matrix_domain }}' ))';
   register: dns_spaces
 
 - debug:
