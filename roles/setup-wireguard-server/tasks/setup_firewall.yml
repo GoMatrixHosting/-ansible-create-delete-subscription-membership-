@@ -103,6 +103,13 @@
     port: '9100'
     proto: tcp
 
+- name: Allow all access to TCP port 9200 for Wireguards Node-Exporter metrics
+  delegate_to: "{{ server_ip }}"
+  ufw:
+    rule: allow
+    port: '9200'
+    proto: tcp
+
 - name: Allow all access to TCP port 18111 with UFW for generic worker
   delegate_to: "{{ server_ip }}"
   ufw:
