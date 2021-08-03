@@ -98,13 +98,6 @@
     mode: '0600'
     state: present
 
-- name: Add plan_title line to server_vars.yml file locally on AWX
-  lineinfile:
-    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/server_vars.yml'
-    line: 'plan_title: {{ plan_title }}'
-    mode: '0600'
-    state: present
-
 # Create organisation.yml file
   
 - name: Touch the same file, but add/remove some permissions
