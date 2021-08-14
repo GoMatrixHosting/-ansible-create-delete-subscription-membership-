@@ -1,5 +1,5 @@
 
-- name: "Re-provisions every Matrix server connected to AWX."
+- name: "Checks for updates hourly, if ones available it applies it to every Matrix server connected to AWX."
   hosts: localhost
   connection: local
   gather_facts: false
@@ -28,7 +28,6 @@
 
     - debug: 
         msg: "Update result: {{ update_result }}"
-
 
     # check if source is updated (skippable)
 
