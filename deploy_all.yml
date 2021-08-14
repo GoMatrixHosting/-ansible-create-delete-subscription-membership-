@@ -1,28 +1,35 @@
 
-# check if source is updated (skippable)
+- name: "Re-provisions every Matrix server connected to AWX."
+  hosts: localhost
+  connection: local
+  gather_facts: false
 
-- name: Include hosting vars of hosting_vars.yml
-  include_vars:
-    file: /var/lib/awx/projects/hosting/hosting_vars.yml
-  no_log: True
+  tasks:
+    - name: Include hosting vars of hosting_vars.yml
+      include_vars:
+        file: /var/lib/awx/projects/hosting/hosting_vars.yml
+      no_log: True
 
-- name: Collect AWX admin token the hard way!
-  shell: |
-      curl -sku admin:{{ admin_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ awx_url }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-  register: tower_token
-  no_log: True
+    - name: Collect AWX admin token the hard way!
+      shell: |
+          curl -sku admin:{{ admin_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ awx_url }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+      register: tower_token
+      no_log: True
 
-- name: Update the AWX admins deploy project
-  awx.awx.tower_project_update:
-    name: "Matrix Docker Ansible Deploy"
-    organization: "{{ org_name }}"
-    wait: yes
-    tower_host: "https://{{ awx_url }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
-    validate_certs: yes
-    register: update_result
-    
-- debug: 
-    msg: "Update result: {{ update_result }}"
+    - name: Update the AWX admins deploy project
+      awx.awx.tower_project_update:
+        name: "Matrix Docker Ansible Deploy"
+        organization: "{{ org_name }}"
+        wait: yes
+        tower_host: "https://{{ awx_url }}"
+        tower_oauthtoken: "{{ tower_token.stdout }}"
+        validate_certs: yes
+      register: update_result
 
-# if so deploy onto all servers
+    - debug: 
+        msg: "Update result: {{ update_result }}"
+
+
+    # check if source is updated (skippable)
+
+    # if so deploy onto all servers
