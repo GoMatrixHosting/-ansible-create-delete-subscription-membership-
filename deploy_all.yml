@@ -20,7 +20,7 @@
     - name: Update the AWX admins deploy project
       awx.awx.tower_project_update:
         name: "Matrix Docker Ansible Deploy"
-        organization: "{{ org_name }}"
+        #organization: "{{ org_name }}"
         wait: yes
         tower_host: "https://{{ awx_url }}"
         tower_oauthtoken: "{{ tower_token.stdout }}"
