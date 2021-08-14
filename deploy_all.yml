@@ -22,9 +22,9 @@
         name: "Matrix Docker Ansible Deploy"
         #organization: "{{ org_name }}"
         wait: yes
-        tower_host: "https://{{ awx_url }}"
+        tower_host: "https://{{ tower_host }}"
         tower_oauthtoken: "{{ tower_token.stdout }}"
-        validate_certs: yes
+        validate_certs: yes 
       register: update_result
 
     - debug: 
