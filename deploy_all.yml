@@ -67,12 +67,12 @@
     - name: Set deploy_all fact
       set_fact:
         deploy_all: True
-      when: (update_result.before is not update_result.after) and (update_result.before is not None)
+      when: (update_result.before is not update_result.after) and (update_result.before)
 
     - name: Set deploy_all fact
       set_fact:
         deploy_all: False
-      when: (update_result.before is update_result.after) or (update_result.before is None)
+      when: (update_result.before is update_result.after) or (not update_result.before)
 
     - debug: 
         msg: "deploy_all: {{ deploy_all }}"
