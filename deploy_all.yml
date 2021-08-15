@@ -54,7 +54,6 @@
         repo: "{{ deploy_source }}"
         dest: /tmp/matrix-docker-ansible-deploy.tar.gz
         force: yes
-        single_branch: yes
       register: update_result
 
     - debug: 
