@@ -7,7 +7,7 @@
   tasks:
     - name: Generate list of deploy/update job templates
       shell: |
-        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Deploy//Update a Server/g'
+        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Deploy\/Update a Server/g'
       register: deploy_templates
 
     - name: Include hosting vars of hosting_vars.yml
