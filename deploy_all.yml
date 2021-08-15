@@ -47,17 +47,41 @@
 #}
 
     # check if source is updated (skippable)
- 
- 
+
     - name: Clone a repo with separate git directory
       git:
         repo: "{{ deploy_source }}"
-        dest: /tmp/matrix-docker-ansible-deploy.tar.gz
+        dest: /tmp/matrix-docker-ansible-deploy
         force: yes
       register: update_result
 
     - debug: 
         msg: "Update result: {{ update_result }}"
+
+    - debug: 
+        msg: "Before result: {{ update_result.before }}"
+
+    - debug: 
+        msg: "After result: {{ update_result.after }}"
+
+    - name: Set deploy_all fact
+      set_fact:
+        deploy_all: True
+      when: (update_result.before is not update_result.after) and (update_result.before is not None)
+
+    - name: Set deploy_all fact
+      set_fact:
+        deploy_all: False
+      when: (update_result.before is update_result.after) or (update_result.before is None)
+
+    - debug: 
+        msg: "deploy_all: {{ deploy_all }}"
+
+#    "msg": "Update result: {'changed': True, 'before': None, 'after': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}"
+#}
+
+#  "msg": "Update result: {'changed': False, 'before': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'remote_url_changed': False, 'after': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}"
+
 
 #    - name: restart service if new version is deployed
 #      service: 
@@ -65,8 +89,6 @@
 #        state: restarted 
 #        enabled: yes
 #      when: examplesoftware.changed
-  
-
-
 
     # if so deploy onto all servers
+    
