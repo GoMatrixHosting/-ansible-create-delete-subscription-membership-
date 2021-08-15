@@ -17,19 +17,57 @@
       register: tower_token
       no_log: True 
 
-    - name: Update the AWX admins deploy project
-      awx.awx.tower_project_update:
-        name: "Matrix Docker Ansible Deploy"
-        #organization: "{{ org_name }}"
-        wait: yes
-        tower_host: "https://{{ tower_host }}"
-        tower_oauthtoken: "{{ tower_token.stdout }}"
-        validate_certs: yes 
+#    - name: Update the AWX admins deploy project
+#      awx.awx.tower_project_update:
+#        name: "Matrix Docker Ansible Deploy"
+#        #organization: "{{ org_name }}"
+#        wait: yes
+#        tower_host: "https://{{ tower_host }}"
+#        tower_oauthtoken: "{{ tower_token.stdout }}"
+#        validate_certs: yes 
+#      register: update_result
+
+#    - debug: 
+#        msg: "Update result: {{ update_result }}"
+
+# NO UPDATE:    
+#{
+#  "msg": "Update result: {'changed': True, 'id': 3488, 'status': 'successful', 'elapsed': 6.436, 'started': '2021-08-14T13:07:50.935252Z', 'finished': '2021-08-14T13:07:57.370755Z', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}",
+#  "_ansible_verbose_always": true,
+#  "_ansible_no_log": false,
+#  "changed": false
+#}
+
+# UPDATE:    
+#{
+#  "msg": "Update result: {'changed': True, 'id': 3491, 'status': 'successful', 'elapsed': 6.901, 'started': '2021-08-14T13:15:14.867065Z', 'finished': '2021-08-14T13:15:21.767965Z', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}",
+#  "_ansible_verbose_always": true,
+#  "_ansible_no_log": false,
+#  "changed": false
+#}
+
+    # check if source is updated (skippable)
+ 
+ 
+    - name: Clone a repo with separate git directory
+      git:
+        repo: "{{ deploy_source }}"
+        dest: /tmp/matrix-docker-ansible-deploy.tar.gz
+        force: yes
+        single_branch: yes
       register: update_result
 
     - debug: 
         msg: "Update result: {{ update_result }}"
 
-    # check if source is updated (skippable)
+#    - name: restart service if new version is deployed
+#      service: 
+#        name: example 
+#        state: restarted 
+#        enabled: yes
+#      when: examplesoftware.changed
+  
+
+
 
     # if so deploy onto all servers
