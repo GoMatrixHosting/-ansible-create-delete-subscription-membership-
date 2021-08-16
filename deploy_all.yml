@@ -15,9 +15,7 @@
         file: /var/lib/awx/projects/hosting/hosting_vars.yml
       no_log: True
 
-    # check if source is updated (skippable)
-
-    - name: Clone a repo with separate git directory
+    - name: Clone the deploy repo to see if it's updated
       git:
         repo: "{{ deploy_source }}"
         dest: /tmp/matrix-docker-ansible-deploy
@@ -34,20 +32,11 @@
         deploy_all: False
       when: (update_result.before == update_result.after) or (not update_result.before)
 
-    - debug: 
-        msg: "deploy_templates: {{ deploy_templates }}"
-
-    - debug: 
-        msg: "deploy_all: {{ deploy_all }}"
-
-#    "msg": "Update result: {'changed': True, 'before': None, 'after': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}"
-
-#  "msg": "Update result: {'changed': False, 'before': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'remote_url_changed': False, 'after': '98e6cd685d7236da8686b5d5208c786ad4d927b9', 'ansible_facts': {'discovered_interpreter_python': '/usr/libexec/platform-python'}, 'failed': False}"
-
     - name: Collect AWX admin token the hard way!
       delegate_to: 127.0.0.1
       shell: |
           curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+      when: deploy_all|bool
       register: tower_token
       no_log: True 
 
@@ -55,13 +44,3 @@
       include_tasks: deploy.yml 
       loop: "{{ deploy_templates.stdout_lines | flatten(levels=1) }}"
       when: deploy_all|bool
-
-#    - name: restart service if new version is deployed
-#      service: 
-#        name: example 
-#        state: restarted 
-#        enabled: yes
-#      when: examplesoftware.changed
-
-    # if so deploy onto all servers
-    
