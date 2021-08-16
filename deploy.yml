@@ -6,4 +6,3 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes 
   register: job
-
