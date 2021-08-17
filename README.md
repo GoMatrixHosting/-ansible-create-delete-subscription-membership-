@@ -35,11 +35,11 @@ PROCESSING: Creates AWX Account for user, creates initial organisation.yml and s
 
 OUTPUT: Working AWX account at provision stage.
 
-# pre-create.yml
+# pre_create.yml
 
 Creates the AWX 'organisation' and 'team' upon MP subscription creation, so they exist before the client logs in to AWX. Makes the initial login process more seamless.
 
-# bind-user-account.yml
+# bind_user_account.yml
 
 After creating a MP subscription and first logging in, this connects a clients AWX account to the appropriate 'team'. Makes the initial login process more seamless. 
 
