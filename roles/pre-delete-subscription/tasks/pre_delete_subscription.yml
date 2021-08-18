@@ -1,0 +1,451 @@
+
+- name: Install jq in AWX
+  delegate_to: 127.0.0.1
+  yum:
+    name: jq
+    state: latest
+    
+- name: Collect AWX admin token the hard way!
+  delegate_to: 127.0.0.1
+  shell: |
+      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+  register: tower_token
+  no_log: True
+
+# create `0 - {{ subsccription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>` job template
+# schedule it {{ delete_subscription_hours_delay }} hours from now
+# should be able to disarm it - by memberpress
+# Remove execute permissions from all the existing job templates, except for the "Access Export", so that they are read-only (done)
+
+# stop existing server (done)
+
+  
+
+
+- name: Create '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
+  delegate_to: 127.0.0.1
+  awx.awx.tower_job_template:
+    name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
+    description: "Performs a backup of the entire service to a remote location."
+    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
+    job_type: run
+    job_tags: "delete-subscription"
+    inventory: "{{ member_id }}"
+    project: "Ansible Create Delete Subscription Membership"
+    playbook: delete_subscription.yml
+    credential: "{{ member_id }} - AWX SSH Key"
+#    survey_enabled: true
+#    survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/backup_server.json') }}"
+    state: present
+    verbosity: 1
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+
+- name: Collect timezone of AWX server (Debian and derivatives only) 
+  command: cat /etc/timezone
+  register: timezone_output
+
+- name: Create an rrule string for a daily schedule
+  set_fact:
+    rrule_line: "RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
+
+- name: Build a schedule for '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
+  awx.awx.tower_schedule:
+    name: "{{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
+    enabled: yes
+    state: present
+    unified_job_template: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
+    rrule: "{{ rrule_line }}"
+    tower_host: "https://{{ awx_url }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+
+
+
+
+
+
+- name: Revoke execute permission on 'Deploy/Update a Server' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Deploy/Update a Server' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+  
+- name: Revoke execute permission on 'Backup Server' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Backup Server"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined 
+
+- name: Grant read permission on 'Backup Server' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Backup Server"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined 
+
+- name: Revoke execute permission on 'Self-Check' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Self-Check"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Self-Check' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Self-Check"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Start/Restart all Services' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Start/Restart all Services"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Start/Restart all Services' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Start/Restart all Services"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Stop all Services' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Stop all Services"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Stop all Services' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Stop all Services"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Corporal (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Corporal (Advanced)"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Corporal (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Corporal (Advanced)"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Dimension' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Dimension"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Dimension' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Dimension"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Element' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Element"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Element' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Element"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Element Subdomain' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Element Subdomain"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Element Subdomain' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Element Subdomain"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Email Relay' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Email Relay"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Email Relay' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Email Relay"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Jitsi' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Jitsi"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Jitsi' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Jitsi"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure ma1sd (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure ma1sd (Advanced)"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure ma1sd (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure ma1sd (Advanced)"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Synapse' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Synapse"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Synapse' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Synapse"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Configure Synapse Admin' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Synapse Admin"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Configure Synapse Admin' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Configure Synapse Admin"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Create User' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Create User"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Create User' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Create User"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Purge Media (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Purge Media (Advanced)"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Purge Media (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Purge Media (Advanced)"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Revoke execute permission on 'Purge Database (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Purge Database (Advanced)"
+    role: execute
+    state: absent
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Grant read permission on 'Purge Database (Advanced)' job template
+  awx.awx.tower_role:
+    team: "{{ member_id }}"
+    job_template: "{{ matrix_domain }} - 0 - Purge Database (Advanced)"
+    role: read
+    state: present
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
+- name: Execute 'Stop all Services' job template
+  awx.awx.tower_job_launch:
+    job_template: "{{ matrix_domain }} - 0 - Stop all Services"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes 
+  when: matrix_domain is defined
