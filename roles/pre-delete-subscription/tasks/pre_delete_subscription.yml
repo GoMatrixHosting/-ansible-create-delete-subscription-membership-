@@ -12,9 +12,9 @@
   register: tower_token
   no_log: True
 
-# create `0 - {{ subsccription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>` job template
-# schedule it {{ delete_subscription_hours_delay }} hours from now
-# should be able to disarm it - by memberpress
+# create `0 - {{ subsccription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>` job template  (done)
+# schedule it {{ delete_subscription_hours_delay }} hours from now (done)
+# should be able to disarm it - by memberpress or survey
 # Remove execute permissions from all the existing job templates, except for the "Access Export", so that they are read-only (done)
 
 # stop existing server (done)
@@ -23,19 +23,18 @@
 
 
 - name: Create '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
-  delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
-    description: "Performs a backup of the entire service to a remote location."
+    description: "Your subscription and Matrix server is scheduled for deletion. date??"
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
     job_type: run
     job_tags: "delete-subscription"
     inventory: "{{ member_id }}"
-    project: "Ansible Create Delete Subscription Membership"
-    playbook: delete_subscription.yml
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
     credential: "{{ member_id }} - AWX SSH Key"
-#    survey_enabled: true
-#    survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/backup_server.json') }}"
+    survey_enabled: true
+    survey_spec: "{{ lookup('file', '{{ role_path }}/survey/delete_subscription.json') }}"
     state: present
     verbosity: 1
     tower_host: "https://{{ tower_host }}"
@@ -43,9 +42,9 @@
     validate_certs: yes
 
 
-- name: Collect timezone of AWX server (Debian and derivatives only) 
-  command: cat /etc/timezone
-  register: timezone_output
+#- name: Collect timezone of AWX server (Debian and derivatives only) 
+#  command: cat /etc/timezone
+#  register: timezone_output
 
 - name: Create an rrule string for a daily schedule
   set_fact:

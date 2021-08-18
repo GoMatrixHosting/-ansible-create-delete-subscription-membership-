@@ -1,0 +1,9 @@
+
+- name: "Queue a deletion job for a subscription."
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  roles:
+    - pre-delete-subscription
+
