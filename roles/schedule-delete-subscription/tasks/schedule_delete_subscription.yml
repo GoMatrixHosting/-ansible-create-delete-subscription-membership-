@@ -531,7 +531,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
-  when: delete_subscription_hours_delay is 0
+  when: delete_subscription_hours_delay | int == 0
 
 # launch deletion job if {{ delete_subscription_hours_delay }} == 0
 
