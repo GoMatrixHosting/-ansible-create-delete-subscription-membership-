@@ -24,13 +24,30 @@
 
 # stop existing server (done)
 
+# copy extra_vars.json
+
+- name: Copy extra_vars.json
+  delegate_to: 127.0.0.1
+  command: |
+    cp /var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json /var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json
+
+# append extra_vars.json
+
+- name: Append new cancel_deletion variable to delete_extra_vars.json
+  delegate_to: 127.0.0.1
+  lineinfile:
+    insertafter: '{'
+    path: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json'
+    line: '  "cancel_deletion": "false",'
+    mode: '0600'
+    state: present
 
 - name: Create '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
   delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     description: "Your subscription and Matrix server is scheduled for deletion. date??"
-    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
+    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json') }}"
     job_type: run
     job_tags: "delete-subscription"
     inventory: "{{ member_id }}"
@@ -70,7 +87,7 @@
     name: "{{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     enabled: yes
     state: present
-    unified_job_template: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
+    unified_job_template: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"w
     rrule: "{{ rrule_line }}"
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
