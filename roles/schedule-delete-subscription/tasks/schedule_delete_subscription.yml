@@ -45,7 +45,7 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-- name: Collect timezone of AWX server (Debian and derivatives only) 
+#- name: Collect timezone of AWX server (Debian and derivatives only) 
 #  delegate_to: 127.0.0.1
 #  command: cat /etc/timezone
 #  register: timezone_output
