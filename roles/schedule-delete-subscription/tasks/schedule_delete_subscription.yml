@@ -57,7 +57,7 @@
 
 - name: Create an rrule string for a daily schedule
   set_fact:
-    rrule_line: "DTSTART;TZID=UTC:{{ timestamp_output.stdout }}RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
+    rrule_line: "DTSTART;TZID=UTC:{{ timestamp_output.stdout }} RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
 
 #    rrule_line_daily: "DTSTART;TZID={{ timezone_output.stdout }}:20200101T000000 RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU,MO,TU,WE,TH,FR,SA"
 
