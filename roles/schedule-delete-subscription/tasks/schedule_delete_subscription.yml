@@ -37,7 +37,7 @@
   delegate_to: 127.0.0.1
   lineinfile:
     insertafter: '{'
-    path: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json'
+    path: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json'
     line: '  "cancel_deletion": "false",'
     mode: '0600'
     state: present
