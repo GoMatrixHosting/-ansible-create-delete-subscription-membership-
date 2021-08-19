@@ -1,0 +1,4 @@
+
+# Queue AWX subscription deletion
+- import_tasks: "{{ role_path }}/tasks/schedule_delete_subscription.yml"
+  tags: schedule-delete-subscription

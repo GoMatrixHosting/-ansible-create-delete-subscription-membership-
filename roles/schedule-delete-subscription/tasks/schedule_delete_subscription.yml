@@ -19,10 +19,9 @@
 
 # stop existing server (done)
 
-  
-
 
 - name: Create '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
+  delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     description: "Your subscription and Matrix server is scheduled for deletion. date??"
@@ -51,6 +50,7 @@
     rrule_line: "RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
 
 - name: Build a schedule for '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
+  delegate_to: 127.0.0.1
   awx.awx.tower_schedule:
     name: "{{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     enabled: yes
@@ -62,12 +62,8 @@
     validate_certs: yes
 
 
-
-
-
-
-
 - name: Revoke execute permission on 'Deploy/Update a Server' job template
+  delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
     job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
@@ -79,6 +75,7 @@
   when: matrix_domain is defined
 
 - name: Grant read permission on 'Deploy/Update a Server' job template
+  delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
     job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
