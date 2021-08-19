@@ -38,7 +38,7 @@
     playbook: setup.yml
     credential: "{{ member_id }} - AWX SSH Key"
     survey_enabled: true
-    survey_spec: "{{ lookup('file', '{{ role_path }}/survey/delete_subscription.json') }}"
+    survey_spec: "{{ lookup('file', '{{ role_path }}/surveys/delete_subscription.json') }}"
     state: present
     verbosity: 1
     tower_host: "https://{{ tower_host }}"
