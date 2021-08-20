@@ -43,7 +43,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
-    description: "Your subscription and Matrix server is scheduled for deletion. date??"
+    description: "Your subscription and Matrix server are scheduled for deletion!"
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json') }}"
     job_type: run
     job_tags: "delete-subscription"
@@ -68,9 +68,6 @@
   set_fact:
     rrule_line: "DTSTART;TZID=UTC:{{ timestamp_output.stdout }} RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
 
-- debug:
-    msg: "rrule_line: '{{ rrule_line }}'"
-
 - name: Build a schedule for '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
   delegate_to: 127.0.0.1
   awx.awx.tower_schedule:
@@ -84,6 +81,7 @@
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
+  when: delete_subscription_hours_delay | int != 0
 
 - name: Revoke execute permission on 'Deploy/Update a Server' job template
   delegate_to: 127.0.0.1
@@ -513,8 +511,6 @@
   ignore_errors: yes
   when: matrix_domain is defined
 
-# wait until its stopped
-
 - name: Execute '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template if delay is immediate
   delegate_to: 127.0.0.1
   awx.awx.tower_job_launch:
@@ -523,6 +519,3 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
   when: delete_subscription_hours_delay | int == 0
-
-# launch deletion job if {{ delete_subscription_hours_delay }} == 0
-
