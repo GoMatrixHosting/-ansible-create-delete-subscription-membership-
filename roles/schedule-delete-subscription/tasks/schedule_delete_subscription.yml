@@ -4,6 +4,14 @@
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
   no_log: True
 
+- name: Include matrix server variables from matrix_vars.yml
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - /var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/matrix_vars.yml
+      skip: true
+  no_log: True
+
 - name: Install jq in AWX
   delegate_to: 127.0.0.1
   yum:
@@ -17,21 +25,10 @@
   register: tower_token
   no_log: True 
 
-# create `0 - {{ subsccription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>` job template  (done)
-# schedule it {{ delete_subscription_hours_delay }} hours from now (done)
-# should be able to disarm it - by memberpress or survey
-# Remove execute permissions from all the existing job templates, except for the "Access Export", so that they are read-only (done)
-
-# stop existing server (done)
-
-# copy extra_vars.json
-
 - name: Copy extra_vars.json
   delegate_to: 127.0.0.1
   command: |
     cp /var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/extra_vars.json /var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json
-
-# append extra_vars.json
 
 - name: Append new cancel_deletion variable to delete_extra_vars.json
   delegate_to: 127.0.0.1
@@ -62,11 +59,6 @@
     tower_oauthtoken: "{{ tower_token.stdout }}"
     validate_certs: yes
 
-#- name: Collect timezone of AWX server (Debian and derivatives only) 
-#  delegate_to: 127.0.0.1
-#  command: cat /etc/timezone
-#  register: timezone_output
-
 - name: Collect timestamp of AWX server
   delegate_to: 127.0.0.1
   command: date +%Y%m%dT%H%M%S
@@ -75,8 +67,6 @@
 - name: Create an rrule string for a daily schedule
   set_fact:
     rrule_line: "DTSTART;TZID=UTC:{{ timestamp_output.stdout }} RRULE:FREQ=HOURLY;INTERVAL={{ delete_subscription_hours_delay }}"
-
-#    rrule_line_daily: "DTSTART;TZID={{ timezone_output.stdout }}:20200101T000000 RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=SU,MO,TU,WE,TH,FR,SA"
 
 - debug:
     msg: "rrule_line: '{{ rrule_line }}'"
