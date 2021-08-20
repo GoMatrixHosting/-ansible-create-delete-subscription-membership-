@@ -1,8 +1,0 @@
-
-- name: "Removes job templates, digitalocean resources, and files/folders associated with a subscription."
-  hosts: localhost
-  connection: local
-  gather_facts: false
-
-  roles:
-    - delete-subscription
