@@ -209,7 +209,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Corporal (Advanced)"
+    job_template: "{{ matrix_domain }} - 1 - Configure Corporal (Advanced)"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -221,7 +221,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Corporal (Advanced)"
+    job_template: "{{ matrix_domain }} - 1 - Configure Corporal (Advanced)"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
