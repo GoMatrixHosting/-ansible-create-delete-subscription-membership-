@@ -233,7 +233,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Dimension"
+    job_template: "{{ matrix_domain }} - 1 - Configure Dimension"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -245,7 +245,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Dimension"
+    job_template: "{{ matrix_domain }} - 1 - Configure Dimension"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -257,7 +257,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Element"
+    job_template: "{{ matrix_domain }} - 1 - Configure Element"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -269,7 +269,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Element"
+    job_template: "{{ matrix_domain }} - 1 - Configure Element"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -281,7 +281,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Element Subdomain"
+    job_template: "{{ matrix_domain }} - 1 - Configure Element Subdomain"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -293,7 +293,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Element Subdomain"
+    job_template: "{{ matrix_domain }} - 1 - Configure Element Subdomain"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -305,7 +305,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Email Relay"
+    job_template: "{{ matrix_domain }} - 1 - Configure Email Relay"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -317,7 +317,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Email Relay"
+    job_template: "{{ matrix_domain }} - 1 - Configure Email Relay"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -329,7 +329,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Jitsi"
+    job_template: "{{ matrix_domain }} - 1 - Configure Jitsi"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -341,7 +341,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Jitsi"
+    job_template: "{{ matrix_domain }} - 1 - Configure Jitsi"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -353,7 +353,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure ma1sd (Advanced)"
+    job_template: "{{ matrix_domain }} - 1 - Configure ma1sd (Advanced)"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -365,7 +365,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure ma1sd (Advanced)"
+    job_template: "{{ matrix_domain }} - 1 - Configure ma1sd (Advanced)"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -377,7 +377,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Synapse"
+    job_template: "{{ matrix_domain }} - 1 - Configure Synapse"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -389,7 +389,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Synapse"
+    job_template: "{{ matrix_domain }} - 1 - Configure Synapse"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -401,7 +401,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Synapse Admin"
+    job_template: "{{ matrix_domain }} - 1 - Configure Synapse Admin"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -413,7 +413,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Configure Synapse Admin"
+    job_template: "{{ matrix_domain }} - 1 - Configure Synapse Admin"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -425,7 +425,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Create User"
+    job_template: "{{ matrix_domain }} - 2 - Create User"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -437,7 +437,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Create User"
+    job_template: "{{ matrix_domain }} - 2 - Create User"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -449,7 +449,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Purge Media (Advanced)"
+    job_template: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -461,7 +461,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Purge Media (Advanced)"
+    job_template: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
@@ -473,7 +473,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Purge Database (Advanced)"
+    job_template: "{{ matrix_domain }} - 2 - Purge Database (Advanced)"
     role: execute
     state: absent
     tower_host: "https://{{ tower_host }}"
@@ -485,7 +485,7 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_role:
     team: "{{ member_id }}"
-    job_template: "{{ matrix_domain }} - 0 - Purge Database (Advanced)"
+    job_template: "{{ matrix_domain }} - 2 - Purge Database (Advanced)"
     role: read
     state: present
     tower_host: "https://{{ tower_host }}"
