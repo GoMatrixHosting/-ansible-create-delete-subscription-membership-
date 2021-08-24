@@ -44,6 +44,7 @@
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     description: "Your subscription and Matrix server are scheduled for deletion!"
+    ask_extra_vars: yes
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json') }}"
     job_type: run
     job_tags: "delete-subscription"
