@@ -1,0 +1,20 @@
+
+# Abort Subscription Deletion
+- include_tasks: "{{ role_path }}/tasks/abort_deletion.yml"
+  tags: delete-subscription
+
+# Delete DigitalOcean Droplet/Space
+- include_tasks: "{{ role_path }}/tasks/delete_server.yml"
+  tags: delete-subscription
+
+# Delete MailGun SMTP Account
+- include_tasks: "{{ role_path }}/tasks/delete_mailgun.yml"
+  tags: delete-subscription
+
+# Delete AWX Job Templates for Server
+- include_tasks: "{{ role_path }}/tasks/delete_awx_templates.yml"
+  tags: delete-subscription
+
+# Delete Organisation Directories
+- include_tasks: "{{ role_path }}/tasks/delete_subscription_directory.yml"
+  tags: delete-subscription
