@@ -49,8 +49,8 @@
     job_type: run
     job_tags: "delete-subscription"
     inventory: "{{ member_id }}"
-    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
-    playbook: setup.yml
+    project: "Ansible Create Delete Subscription Membership"
+    playbook: delete_subscription.yml
     credential: "{{ member_id }} - AWX SSH Key"
     survey_enabled: true
     survey_spec: "{{ lookup('file', '{{ role_path }}/surveys/delete_subscription.json') }}"

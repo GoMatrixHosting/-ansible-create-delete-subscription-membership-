@@ -50,7 +50,7 @@
       awx.awx.tower_job_template:
         name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
         job_type: run
-        project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+        project: "Ansible Create Delete Subscription Membership"
         playbook: setup.yml
         state: absent
         tower_host: "https://{{ tower_host }}"
