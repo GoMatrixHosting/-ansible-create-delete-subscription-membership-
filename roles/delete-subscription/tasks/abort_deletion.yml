@@ -259,7 +259,7 @@
   delegate_to: 127.0.0.1
   template:
     src: '{{ role_path }}/templates/cleanup_deletion_template.json.j2'
-    dest: '/var/lib/awx/projects/cleanup_deletion_template.json'
+    dest: '/var/lib/awx/projects/hosting/cleanup_deletion_template.json'
   when: cancel_deletion|bool
 
 - name: Re-create '00 - Cleanup Deletion Template' job template
