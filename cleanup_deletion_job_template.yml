@@ -27,7 +27,7 @@
         name: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
         job_type: run
         project: "Ansible Create Delete Subscription Membership"
-        playbook: setup.yml
+        playbook: delete_subscription.yml
         state: absent
         tower_host: "https://{{ tower_host }}"
         tower_oauthtoken: "{{ tower_token.stdout }}"
