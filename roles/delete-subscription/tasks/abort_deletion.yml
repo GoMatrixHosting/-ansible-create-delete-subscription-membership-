@@ -229,6 +229,26 @@
     validate_certs: yes
   when: (matrix_domain is defined) and (cancel_deletion|bool)
 
+- name: Execute 'Start/Restart all Services' job template
+  delegate_to: 127.0.0.1
+  awx.awx.tower_job_launch:
+    job_template: "{{ matrix_domain }} - 0 - Start/Restart all Services"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  register: job
+  when: (matrix_domain is defined) and (cancel_deletion|bool)
+
+- name: Wait for job max 300s
+  awx.awx.tower_job_wait:
+    job_id: "{{ job.id }}"
+    timeout: 300
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  ignore_errors: yes
+  when: (matrix_domain is defined) and (cancel_deletion|bool)
+
 - name: Save new 'Delete Job Template' survey.json to the AWX tower, template
   delegate_to: 127.0.0.1
   template:
