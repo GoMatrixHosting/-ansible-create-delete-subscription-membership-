@@ -5,5 +5,4 @@
   gather_facts: false
 
   roles:
-    - delete-server-and-templates
-
+    - delete-subscription

@@ -1,0 +1,18 @@
+{
+  "name": "Delete Subscription",
+  "description": "Your subscription and Matrix server is scheduled for deletion.",
+  "spec": [
+    {
+      "question_name": "Cancel Deletion",
+      "question_description": "Aborts the deletion of this subscription and server.",
+      "required": true,
+      "min": null,
+      "max": null,
+      "default": "false",
+      "choices": "true\nfalse",
+      "new_question": true,
+      "variable": "cancel_deletion",
+      "type": "multiplechoice"
+    }
+  ]
+}
