@@ -10,14 +10,14 @@
   template:
     src: '{{ role_path }}/templates/cleanup_deletion_template_deployed.json.j2'
     dest: '/var/lib/awx/projects/hosting/cleanup_deletion_template-{{ subscription_id }}.json'
-  when: (matrix_domain is defined) and (cancel_deletion|bool)
+  when: matrix_domain is defined
   
 - name: Save new 'Delete Job Template' survey.json to the AWX tower, template
   delegate_to: 127.0.0.1
   template:
     src: '{{ role_path }}/templates/cleanup_deletion_template.json.j2'
     dest: '/var/lib/awx/projects/hosting/cleanup_deletion_template-{{ subscription_id }}.json'
-  when: (matrix_domain is undefined) and (cancel_deletion|bool)
+  when: matrix_domain is undefined
 
 - name: Re-create '00 - Cleanup Deletion Template' job template
   delegate_to: 127.0.0.1
