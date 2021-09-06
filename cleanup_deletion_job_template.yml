@@ -56,3 +56,9 @@
         tower_host: "https://{{ tower_host }}"
         tower_oauthtoken: "{{ tower_token.stdout }}"
         validate_certs: yes
+
+   - name: Delete the cleanup_deletion_template extra variables file
+     delegate_to: 127.0.0.1
+     file:
+       path: '/var/lib/awx/projects/hosting/cleanup_deletion_template-{{ subscription_id }}.json'
+       state: absent
