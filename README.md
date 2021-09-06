@@ -10,6 +10,16 @@ This repository also contains the playbooks needed to delete a subscription or m
 You need to setup the AWX system to use this playbook, see the [create-awx-system repository](https://gitlab.com/GoMatrixHosting/create-awx-system).
 
 
+# 00 - Create Account (pre_create.yml)
+
+Creates the AWX 'organisation' and 'team' upon MP subscription creation, so they exist before the client logs in to AWX. Makes the initial login process more seamless.
+
+
+# 00 - Bind User Account (bind_user_account.yml)
+
+After creating a MP subscription and first logging in, this connects a clients AWX account to the appropriate 'team'. Makes the initial login process more seamless. 
+
+
 # 00 - Create MP Subscription (create.yml)
 
 INPUT (extra_variables):
@@ -39,16 +49,6 @@ INPUT (extra_variables):
 PROCESSING: Creates AWX Account for user, creates initial organisation.yml and server_vars.yml file. Also creates initial '{{ subscription_id }} Provision Server' playbook in users account, which will allow the client to select their base url, element client url, the DigitalOcean droplet location or to connect their own On-Premises server.
 
 OUTPUT: Working AWX account at provision stage.
-
-
-# pre_create.yml
-
-Creates the AWX 'organisation' and 'team' upon MP subscription creation, so they exist before the client logs in to AWX. Makes the initial login process more seamless.
-
-
-# bind_user_account.yml
-
-After creating a MP subscription and first logging in, this connects a clients AWX account to the appropriate 'team'. Makes the initial login process more seamless. 
 
 
 # 00 - Create Manual Subscription (create.yml)
