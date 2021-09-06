@@ -7,7 +7,7 @@ This repository also contains the playbooks needed to delete a subscription or m
 
 # Prerequisites
 
-You need to setup the AWX system to use this playbook, see the (create-awx-system repository)[https://gitlab.com/GoMatrixHosting/create-awx-system].
+You need to setup the AWX system to use this playbook, see the [create-awx-system repository](https://gitlab.com/GoMatrixHosting/create-awx-system).
 
 
 # 00 - Create MP Subscription (create.yml)
