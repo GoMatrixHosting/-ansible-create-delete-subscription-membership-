@@ -1,0 +1,37 @@
+
+# change authorized_keys on the client server
+# reset 'AWX SSH Key credential' in that subscription
+
+# Example output:
+# gomatrixhostingfuckyeah.xyz,billy.bob
+# gomatrixhostingforever.xyz,billy.bob
+# gomatrixhostingisawesome.xyz,billy.bob
+
+- name: Collect necessary variables from input
+  set_fact:
+    id_array: "{{ item.split(',') }}"
+
+- name: Update authorized_keys with new client public key
+  delegate_to: "{{ id_array.0 }}"
+  shell: |
+    cp /root/.ssh/authorized_keys /root/.ssh/authorized_keys.backup \
+    && truncate -s 0 /root/.ssh/authorized_keys \
+    && echo "{{ new_ssh_public_key }}" >> /root/.ssh/authorized_keys
+
+# need member_id
+# need client_private_ssh_key_password ???
+
+- name: Add 'AWX SSH Key' credential to users organisation
+  awx.awx.tower_credential:
+    name: "{{ id_array.1 }} - AWX SSH Key"
+    description: "The SSH key for Provision/Deploy"
+    organization: "{{ id_array.1 }}"
+    credential_type: Machine
+    inputs:
+      ssh_key_data: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_private.key') }}"
+      ssh_key_unlock: "{{ client_private_ssh_key_password }}"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+
+
