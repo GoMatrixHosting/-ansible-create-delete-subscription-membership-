@@ -36,9 +36,9 @@
 
 # load public key into new_ssh_public_key
 
-    - name: Load
+    - name: Load new AWX > Client public SSH key into variable
       set_fact:
-        new_ssh_public_key: "{{ lookup(‘file’, ‘/var/lib/awx/projects/hosting/client_public.key’) }}"
+        new_ssh_public_key: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_public.key') }}"
 
     - name: Print new_ssh_public_key value
       debug:
