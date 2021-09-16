@@ -1,6 +1,6 @@
 - name: "Rotates the client SSH key for every server."
   hosts: localhost
-#  connection: local
+  connection: local
   gather_facts: false
 
 # needs to be a section in create-awx-system where there's a 'hosting_name - AWX SSH Key' credential that is the same as the one in each subscription? [done]
@@ -13,25 +13,21 @@
 # - update backup servers authorized_keys? i guess?
   
     - name: Install jq in AWX
-      delegate_to: localhost
       yum:
         name: jq
         state: latest
   
     - name: Generate a list of matrix_domains
-      delegate_to: 127.0.0.1
       shell: |
         cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain,.member_id' | sed "N;s/\n/,/" | grep -ve "^null,"
       register: list_matrix_domain_and_member_id
 
     - name: Include hosting vars
-      delegate_to: 127.0.0.1
       include_vars:
         file: /var/lib/awx/projects/hosting/hosting_vars.yml
       no_log: True
 
     - name: Include vaulted SSH password variable
-      delegate_to: 127.0.0.1
       include_vars:
         file: /var/lib/awx/projects/hosting/vaulted_ssh_password.yml
       no_log: true
@@ -60,7 +56,6 @@
 # finally after all those changes have been applied, change the admin users SSH Keys credential
 
     - name: Re-create 'AWX SSH Key' credential in AWX admins organisation
-      delegate_to: 127.0.0.1
       awx.awx.tower_credential:
         name: "{{ org_name }} [Admin] - AWX SSH Key"
         description: "The SSH key for accessing client servers."

@@ -25,7 +25,6 @@
 # need client_private_ssh_key_password ???
 
 - name: Re-create 'AWX SSH Key' credential in users organisation
-  delegate_to: 127.0.0.1
   awx.awx.tower_credential:
     name: "{{ id_array.1 }} - AWX SSH Key"
     description: "The SSH key for Provision/Deploy"
