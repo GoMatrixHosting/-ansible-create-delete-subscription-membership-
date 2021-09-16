@@ -11,6 +11,9 @@
   set_fact:
     id_array: "{{ item.split(',') }}"
 
+- debug:
+    msg: "SSHing into matrix.{{ id_array.0 }}"
+
 - name: Update authorized_keys with new client public key
   delegate_to: "matrix.{{ id_array.0 }}"
   shell: |
