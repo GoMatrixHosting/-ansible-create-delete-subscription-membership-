@@ -12,6 +12,12 @@
 # - update AWX hosts authorized_keys? not possible or wise
 # - update backup servers authorized_keys? i guess?
   
+    - name: Install jq in AWX
+      #delegate_to: 127.0.0.1
+      yum:
+        name: jq
+        state: latest
+  
     - name: Generate a list of matrix_domains
       shell: |
         cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain,.member_id' | sed "N;s/\n/,/" | grep -ve "^null,"
