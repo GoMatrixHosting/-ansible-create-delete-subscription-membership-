@@ -12,7 +12,7 @@
     id_array: "{{ item.split(',') }}"
 
 - name: Update authorized_keys with new client public key
-  delegate_to: "{{ id_array.0 }}"
+  delegate_to: "matrix.{{ id_array.0 }}"
   shell: |
     cp /root/.ssh/authorized_keys /root/.ssh/authorized_keys.backup \
     && truncate -s 0 /root/.ssh/authorized_keys \
