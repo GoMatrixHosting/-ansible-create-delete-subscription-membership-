@@ -6,6 +6,12 @@
 # needs to be a section in create-awx-system where there's a 'hosting_name - AWX SSH Key' credential that is the same as the one in each subscription? [done]
 
   tasks:
+  
+# Extra tasks
+# - update admin users password? could do
+# - update AWX hosts authorized_keys? not possible or wise
+# - update backup servers authorized_keys? i guess?
+  
     - name: Generate a list of matrix_domains
       shell: |
         cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain,.member_id' | sed "N;s/\n/,/" | grep -ve "^null,"
@@ -15,6 +21,12 @@
       include_vars:
         file: /var/lib/awx/projects/hosting/hosting_vars.yml
       no_log: True
+
+
+    - name: Include vaulted SSH password variable
+      include_vars:
+        file: /var/lib/awx/projects/hosting/vaulted_ssh_password.yml
+      no_log: true
 
 # load public key into new_ssh_public_key
 
@@ -38,4 +50,18 @@
       loop: "{{ list_matrix_domain_and_member_id.stdout_lines | flatten(levels=1) }}"
 
 # finally after all those changes have been applied, change the admin users SSH Keys credential
+
+    - name: Re-create 'AWX SSH Key' credential in AWX admins organisation
+      awx.awx.tower_credential:
+        name: "{{ org_name }} [Admin] - AWX SSH Key"
+        description: "The SSH key for accessing client servers."
+        organization: "{{ org_name }} [Admin]"
+        credential_type: Machine
+        inputs:
+          ssh_key_data: "{{ lookup('file', '{{ client_private_ssh_key }}') }}"
+          ssh_key_unlock: "{{ client_private_ssh_key_password }}"
+        tower_host: "https://{{ awx_url }}"
+        tower_oauthtoken: "{{ tower_token.stdout }}"
+        validate_certs: yes
+
 # trigger re-provision?
