@@ -16,7 +16,7 @@
 # - update backup servers authorized_keys? i guess?
   
     - name: Install jq in AWX
-      delegate_to: 127.0.0.1
+      delegate_to: localhost
       yum:
         name: jq
         state: latest
