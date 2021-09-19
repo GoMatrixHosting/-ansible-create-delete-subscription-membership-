@@ -1,6 +1,6 @@
 - name: "Rotates the client SSH key for every server."
   hosts: localhost
-  connection: local
+#  connection: local
   gather_facts: false
 
   vars:
