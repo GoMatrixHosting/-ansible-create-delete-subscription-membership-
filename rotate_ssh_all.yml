@@ -59,7 +59,6 @@
       no_log: True 
 
     - name: Execute every job template sequentially
-      delegate_to: 127.0.0.1
       include_tasks: rotate_ssh.yml 
       loop: "{{ list_matrix_domain_and_member_id.stdout_lines | flatten(levels=1) }}"
 
