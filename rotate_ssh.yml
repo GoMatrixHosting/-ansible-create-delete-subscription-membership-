@@ -11,16 +11,24 @@
   set_fact:
     id_array: "{{ item.split(',') }}"
 
-- debug:
-    msg: "SSHing into matrix.{{ id_array.0 }}"
+- name: Execute every job template sequentially
+  awx.awx.tower_job_launch:
+    job_template: "{{ id_array.0 }}"
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes 
+  register: job
 
-- name: Update authorized_keys with new client public key
-  #delegate_to: "matrix.{{ id_array.0 }}"
-  delegate_to: "{{ id_array.0 }}"
-  shell: |
-    cp /root/.ssh/authorized_keys /root/.ssh/authorized_keys.backup \
-    && truncate -s 0 /root/.ssh/authorized_keys \
-    && echo "{{ new_ssh_public_key }}" >> /root/.ssh/authorized_keys
+- name: Wait for job max 300s
+  awx.awx.tower_job_wait:
+    job_id: "{{ id_array.0 }}"
+    timeout: 300
+    tower_host: "https://{{ tower_host }}"
+    tower_oauthtoken: "{{ tower_token.stdout }}"
+    validate_certs: yes
+  ignore_errors: yes
+
+# YOU CAN'T DELEGATE TO A HOST THAT ISN'T DEFINED IN THE INVENTORY :) needs a deploy stage job imo
 
 # need member_id
 # need client_private_ssh_key_password ???
