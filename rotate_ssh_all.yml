@@ -3,8 +3,8 @@
 #  connection: local
   gather_facts: false
 
-  vars:
-    ansible_connection: local
+#  vars:
+#    ansible_connection: local
 
 # needs to be a section in create-awx-system where there's a 'hosting_name - AWX SSH Key' credential that is the same as the one in each subscription? [done]
 
