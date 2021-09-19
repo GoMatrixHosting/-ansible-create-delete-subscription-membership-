@@ -54,7 +54,7 @@
 
     - name: Execute every job template sequentially
       include_tasks: rotate_ssh.yml 
-      loop: "{{ llist_job_templates_and_member_id.stdout_lines | flatten(levels=1) }}"
+      loop: "{{ list_job_templates_and_member_id.stdout_lines | flatten(levels=1) }}"
 
 # finally after all those changes have been applied, change the admin users SSH Keys credential
 
