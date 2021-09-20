@@ -22,8 +22,8 @@
   
     - name: Generate a list of matrix_domains
       shell: |
-        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain,.member_id' | sed "N;s/\n/ - 00 - Rotate SSH Key,/" | grep -ve "^null -"
-      register: list_job_templates_and_member_id
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain' | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
+      register: list_job_templates
 
     - name: Include hosting vars
       include_vars:
@@ -52,9 +52,18 @@
       register: tower_token
       no_log: True 
 
-    - name: Execute every job template sequentially
-      include_tasks: rotate_ssh.yml 
-      loop: "{{ list_job_templates_and_member_id.stdout_lines | flatten(levels=1) }}"
+    - name: Execute every job template sequentially (change host)
+      include_tasks: rotate_ssh_host.yml 
+      loop: "{{ list_job_templates.stdout_lines | flatten(levels=1) }}"
+
+    - name: Generate a list of member_ids
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.member_id' | awk '!seen[$0]++'
+      register: list_member_ids
+
+    - name: Execute every job template sequentially (change credential)
+      include_tasks: rotate_ssh_credential.yml 
+      loop: "{{ list_member_ids.stdout_lines | flatten(levels=1) }}"
 
 # finally after all those changes have been applied, change the admin users SSH Keys credential
 
