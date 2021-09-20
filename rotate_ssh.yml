@@ -3,9 +3,9 @@
 # reset 'AWX SSH Key credential' in that subscription
 
 # Example output:
-# gomatrixhostingfuckyeah.xyz,billy.bob
-# gomatrixhostingforever.xyz,64
-# gomatrixhostingisawesome.xyz,63
+# gomatrixhostingfuckyeah.xyz - 00 - Rotate SSH Key,billy.bob
+# gomatrixhostingforever.xyz - 00 - Rotate SSH Key,64
+# gomatrixhostingisawesome.xyz - 00 - Rotate SSH Key,63
 
 - name: Collect necessary variables from input
   set_fact:
@@ -21,7 +21,7 @@
 
 - name: Wait for job max 300s
   awx.awx.tower_job_wait:
-    job_id: "{{ id_array.0 }}"
+    job_id: "{{ job.id }}"
     timeout: 300
     tower_host: "https://{{ tower_host }}"
     tower_oauthtoken: "{{ tower_token.stdout }}"
