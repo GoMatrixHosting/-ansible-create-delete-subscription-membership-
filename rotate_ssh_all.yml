@@ -1,4 +1,4 @@
-- name: "Rotates the client SSH key for every server."
+- name: "Rotates the client SSH key for every server and re-creates all the SSH credentials in AWX."
   hosts: localhost
   connection: local
   gather_facts: false
@@ -39,24 +39,8 @@
       shell: |
         curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X GET https://{{ tower_host }}/api/v2/credentials/ | jq '.results[] | {name}' | grep -e "^.* - AWX SSH Key" | sed 's/  \"name\": \"//g' | sed 's/ - AWX SSH Key\"//g'
       register: list_member_ids
+      no_log: True
 
     - name: Execute every job template sequentially (change credential)
       include_tasks: rotate_ssh_credential.yml 
       loop: "{{ list_member_ids.stdout_lines | flatten(levels=1) }}"
-
-# finally after all those changes have been applied, change the admin users SSH Keys credential
-
-#    - name: Re-create 'AWX SSH Key' credential in AWX admins organisation
-#      awx.awx.tower_credential:
-#        name: "{{ org_name }} [Admin] - AWX SSH Key"
-#        description: "The SSH key for accessing client servers."
-#        organization: "{{ org_name }} [Admin]"
-#        credential_type: Machine
-#        inputs:
-#          ssh_key_data: "{{ lookup('file', '{{ client_private_ssh_key }}') }}"
-#          ssh_key_unlock: "{{ client_private_ssh_key_password }}"
-#        tower_host: "https://{{ awx_url }}"
-#        tower_oauthtoken: "{{ tower_token.stdout }}"
-#        validate_certs: yes
-
-# trigger re-provision?
