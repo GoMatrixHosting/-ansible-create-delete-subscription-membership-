@@ -3,27 +3,11 @@
   connection: local
   gather_facts: false
 
-#  vars:
-#    ansible_connection: local
-
-# needs to be a section in create-awx-system where there's a 'hosting_name - AWX SSH Key' credential that is the same as the one in each subscription? [done]
-
   tasks:
-  
-# Extra tasks
-# - update admin users password? could do
-# - update AWX hosts authorized_keys? not possible or wise
-# - update backup servers authorized_keys? i guess?
-  
     - name: Install jq in AWX
       yum:
         name: jq
         state: latest
-  
-    - name: Generate a list of matrix_domains
-      shell: |
-        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain' | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
-      register: list_job_templates
 
     - name: Include hosting vars
       include_vars:
@@ -35,16 +19,6 @@
         file: /var/lib/awx/projects/hosting/vaulted_ssh_password.yml
       no_log: true
 
-# load public key into new_ssh_public_key
-
-#    - name: Load new AWX > Client public SSH key into variable
-#      set_fact:
-#        new_ssh_public_key: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_public.key') }}"
-
-#    - name: Print new_ssh_public_key value
-#      debug:
-#        msg: "new_ssh_public_key: {{ new_ssh_public_key }}"
-
     - name: Collect AWX admin token the hard way!
       delegate_to: 127.0.0.1
       shell: |
@@ -52,13 +26,18 @@
       register: tower_token
       no_log: True 
 
+    - name: Generate a list of matrix_domains
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain' | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
+      register: list_job_templates
+
     - name: Execute every job template sequentially (change host)
       include_tasks: rotate_ssh_host.yml 
       loop: "{{ list_job_templates.stdout_lines | flatten(levels=1) }}"
 
-    - name: Generate a list of member_ids
+    - name: Generate a list of member_ids that have 'AWX SSH Key' credentials
       shell: |
-        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.member_id' | awk '!seen[$0]++'
+        curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X GET https://{{ tower_host }}/api/v2/credentials/ | jq '.results[] | {name}' | grep -e "^.* - AWX SSH Key" | sed 's/  \"name\": \"//g' | sed 's/ - AWX SSH Key\"//g'
       register: list_member_ids
 
     - name: Execute every job template sequentially (change credential)
