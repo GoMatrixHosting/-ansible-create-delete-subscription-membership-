@@ -1,0 +1,46 @@
+- name: "Rotates the client SSH key for every server and re-creates all the SSH credentials in AWX."
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Install jq in AWX
+      yum:
+        name: jq
+        state: latest
+
+    - name: Include hosting vars
+      include_vars:
+        file: /var/lib/awx/projects/hosting/hosting_vars.yml
+      no_log: True
+
+    - name: Include vaulted SSH password variable
+      include_vars:
+        file: /var/lib/awx/projects/hosting/vaulted_ssh_password.yml
+      no_log: true
+
+    - name: Collect AWX admin token the hard way!
+      delegate_to: 127.0.0.1
+      shell: |
+          curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+      register: tower_token
+      no_log: True 
+
+    - name: Generate a list of matrix_domains
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain' | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
+      register: list_job_templates
+
+    - name: Execute every job template sequentially (change host)
+      include_tasks: rotate_ssh_host.yml 
+      loop: "{{ list_job_templates.stdout_lines | flatten(levels=1) }}"
+
+    - name: Generate a list of member_ids that have 'AWX SSH Key' credentials
+      shell: |
+        curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X GET https://{{ tower_host }}/api/v2/credentials/ | jq '.results[] | {name}' | grep -e "^.* - AWX SSH Key" | sed 's/  \"name\": \"//g' | sed 's/ - AWX SSH Key\"//g'
+      register: list_member_ids
+      no_log: True
+
+    - name: Execute every job template sequentially (change credential)
+      include_tasks: rotate_ssh_credential.yml 
+      loop: "{{ list_member_ids.stdout_lines | flatten(levels=1) }}"
