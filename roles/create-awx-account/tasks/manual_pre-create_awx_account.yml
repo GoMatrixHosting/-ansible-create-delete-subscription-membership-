@@ -12,6 +12,7 @@
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_master_token }}"
   register: awx_session_token
+  no_log: True
 
 - name: Create AWX organisation
   awx.awx.tower_organization:

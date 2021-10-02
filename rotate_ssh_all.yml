@@ -22,6 +22,7 @@
         tower_host: "https://{{ awx_host }}"
         tower_oauthtoken: "{{ awx_master_token }}"
       register: awx_session_token
+      no_log: True
 
     - name: Generate a list of matrix_domains
       shell: |
