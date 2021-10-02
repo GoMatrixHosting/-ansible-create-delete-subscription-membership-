@@ -1,10 +1,4 @@
 
-- name: Install jq in AWX
-  delegate_to: 127.0.0.1
-  yum:
-    name: jq
-    state: latest
-
 - name: Include AWX master token from awx_tokens.yml
   include_vars:
     file: /var/lib/awx/projects/hosting/awx_tokens.yml
