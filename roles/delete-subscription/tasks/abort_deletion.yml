@@ -9,6 +9,7 @@
   include_vars:
     file: /var/lib/awx/projects/hosting/awx_tokens.yml
   no_log: True
+  when: cancel_deletion|bool
 
 - name: Create a AWX session token for executing modules
   awx.awx.tower_token:
@@ -17,6 +18,7 @@
     state: present
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_master_token }}"
+  when: cancel_deletion|bool
   register: awx_session_token
 
 - name: Remove schedule for '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
