@@ -39,8 +39,6 @@
       include_tasks: rotate_ssh_host.yml 
       loop: "{{ list_job_templates.stdout_lines | flatten(levels=1) }}"
 
-# Broken by 0.6.1
-
     - name: Generate a list of member_ids that have 'AWX SSH Key' credentials
       shell: |
         jq -r '.matrix_domain,.member_id' /var/lib/awx/projects/clients/*/*/extra_vars.json | sed "N;s/\n/,/" | grep -ve "^null," | sed 's/.*,//'
