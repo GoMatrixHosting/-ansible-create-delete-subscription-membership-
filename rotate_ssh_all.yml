@@ -43,7 +43,7 @@
 
     - name: Generate a list of member_ids that have 'AWX SSH Key' credentials
       shell: |
-        curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X GET https://{{ tower_host }}/api/v2/credentials/ | jq '.results[] | {name}' | grep -e "^.* - AWX SSH Key" | sed 's/  \"name\": \"//g' | sed 's/ - AWX SSH Key\"//g'
+        jq -r '.matrix_domain,.member_id' /var/lib/awx/projects/clients/*/*/extra_vars.json | sed "N;s/\n/,/" | grep -ve "^null," | sed 's/.*,//'
       register: list_member_ids
       no_log: True
 
