@@ -44,6 +44,13 @@
       register: awx_session_token
       no_log: True
 
+    - name: Install jq in AWX
+      delegate_to: 127.0.0.1
+      yum:
+        name: jq
+        state: latest
+      when: deploy_all|bool
+
     - name: Generate a list of member_ids
       shell: |
         jq -r '.member_id' /var/lib/awx/projects/clients/*/*/extra_vars.json | sort -u
