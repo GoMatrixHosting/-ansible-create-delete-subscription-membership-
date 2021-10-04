@@ -1,0 +1,15 @@
+
+- name: Add 'Spantaleev's Deploy' project to users organisation
+  awx.awx.tower_project:
+    name: "{{ item }} - Matrix Docker Ansible Deploy"
+    description: "Creating and updating a Matrix service on an already provisioned server."
+    organization: "{{ item }}"
+    scm_type: git
+    scm_url: '{{ deploy_source }}'
+    scm_branch: '{{ deploy_branch }}'
+    scm_delete_on_update: yes
+    scm_update_on_launch: no
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+    validate_certs: yes

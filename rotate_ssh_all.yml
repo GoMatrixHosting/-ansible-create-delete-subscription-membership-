@@ -24,14 +24,22 @@
       register: awx_session_token
       no_log: True
 
+    - name: Install jq in AWX
+      delegate_to: 127.0.0.1
+      yum:
+        name: jq
+        state: latest
+
     - name: Generate a list of matrix_domains
       shell: |
-        cat /var/lib/awx/projects/clients/*/*/extra_vars.json | jq -r '.matrix_domain' | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
+        jq -r '.matrix_domain' /var/lib/awx/projects/clients/*/*/extra_vars.json | sed "s/$/ - 00 - Rotate SSH Key/" | grep -ve "^null"
       register: list_job_templates
 
     - name: Execute every job template sequentially (change host)
       include_tasks: rotate_ssh_host.yml 
       loop: "{{ list_job_templates.stdout_lines | flatten(levels=1) }}"
+
+# Broken by 0.6.1
 
     - name: Generate a list of member_ids that have 'AWX SSH Key' credentials
       shell: |
