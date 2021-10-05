@@ -1,15 +1,10 @@
 
-- name: "Checks for updates hourly, if ones available it applies it to every Matrix server connected to AWX."
+- name: "Checks for updates hourly, if ones available it applies it to every Matrix server connected to AWX, also updates SCM projects for deploy stage jobs."
   hosts: localhost
   connection: local
   gather_facts: false
 
   tasks:
-    - name: Generate list of deploy/update job templates
-      shell: |
-        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Deploy\/Update a Server/g'
-      register: deploy_templates
-
     - name: Include hosting vars of hosting_vars.yml
       include_vars:
         file: /var/lib/awx/projects/hosting/hosting_vars.yml
@@ -32,15 +27,58 @@
         deploy_all: False
       when: (update_result.before == update_result.after) or (not update_result.before)
 
-    - name: Collect AWX admin token the hard way!
-      delegate_to: 127.0.0.1
-      shell: |
-          curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
+    - name: Include AWX master token from awx_tokens.yml
+      include_vars:
+        file: /var/lib/awx/projects/hosting/awx_tokens.yml
       when: deploy_all|bool
-      register: tower_token
-      no_log: True 
+      no_log: True
 
-    - name: Execute every job template sequentially
-      include_tasks: deploy.yml 
+    - name: Create a AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: present
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_master_token }}"
+      when: deploy_all|bool
+      register: awx_session_token
+      no_log: True
+
+    - name: Install jq in AWX
+      delegate_to: 127.0.0.1
+      yum:
+        name: jq
+        state: latest
+      when: deploy_all|bool
+
+    - name: Generate a list of member_ids
+      shell: |
+        jq -r '.member_id' /var/lib/awx/projects/clients/*/*/extra_vars.json | sort -u
+      when: deploy_all|bool
+      register: list_member_ids
+
+    - name: Execute every job template sequentially (update projects)
+      include_tasks: deploy_scm.yml 
+      loop: "{{ list_member_ids.stdout_lines | flatten(levels=1) }}"
+      when: deploy_all|bool
+
+    - name: Generate list of deploy/update job templates
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Deploy\/Update a Server/g'
+      when: deploy_all|bool
+      register: deploy_templates
+
+    - name: Execute every job template sequentially (launch all deploys)
+      include_tasks: deploy_launch.yml 
       loop: "{{ deploy_templates.stdout_lines | flatten(levels=1) }}"
+      when: deploy_all|bool
+
+    - name: Delete the AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: absent
+        existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
       when: deploy_all|bool

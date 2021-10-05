@@ -4,6 +4,11 @@
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
   no_log: True
 
+- name: Include AWX master token from awx_tokens.yml
+  include_vars:
+    file: /var/lib/awx/projects/hosting/awx_tokens.yml
+  no_log: True
+
 - name: Include matrix server variables from matrix_vars.yml
   include_vars: "{{ item }}"
   with_first_found:
@@ -12,18 +17,15 @@
       skip: true
   no_log: True
 
-- name: Install jq in AWX
-  delegate_to: 127.0.0.1
-  yum:
-    name: jq
-    state: latest
-    
-- name: Collect AWX admin token the hard way!
-  delegate_to: 127.0.0.1
-  shell: |
-      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-  register: tower_token
-  no_log: True 
+- name: Create a AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_master_token }}"
+  register: awx_session_token
+  no_log: True
 
 - name: Copy extra_vars.json
   delegate_to: 127.0.0.1
@@ -56,8 +58,8 @@
     survey_spec: "{{ lookup('file', '{{ role_path }}/surveys/delete_subscription.json') }}"
     state: present
     verbosity: 1
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Grant read permission on '<< SUBSCRIPTION DELETION IN PROGRESS >>' job template
@@ -67,8 +69,8 @@
     job_template: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Collect timestamp of AWX server
@@ -90,8 +92,8 @@
     job_tags: "delete-subscription"
     extra_data: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json') }}"
     rrule: "{{ rrule_line }}"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: delete_subscription_hours_delay | int != 0
 
@@ -102,8 +104,8 @@
     job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -114,8 +116,8 @@
     job_template: "{{ matrix_domain }} - 0 - Deploy/Update a Server"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
   
@@ -126,8 +128,8 @@
     job_template: "{{ matrix_domain }} - 0 - Backup Server"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined 
 
@@ -138,8 +140,8 @@
     job_template: "{{ matrix_domain }} - 0 - Backup Server"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined 
 
@@ -150,8 +152,8 @@
     job_template: "{{ matrix_domain }} - 0 - Self-Check"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -162,8 +164,8 @@
     job_template: "{{ matrix_domain }} - 0 - Self-Check"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -174,8 +176,8 @@
     job_template: "{{ matrix_domain }} - 0 - Start/Restart all Services"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -186,8 +188,8 @@
     job_template: "{{ matrix_domain }} - 0 - Start/Restart all Services"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -198,8 +200,8 @@
     job_template: "{{ matrix_domain }} - 0 - Stop all Services"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -210,8 +212,8 @@
     job_template: "{{ matrix_domain }} - 0 - Stop all Services"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -222,8 +224,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Corporal (Advanced)"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -234,8 +236,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Corporal (Advanced)"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -246,8 +248,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Dimension"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -258,8 +260,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Dimension"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -270,8 +272,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Element"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -282,8 +284,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Element"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -294,8 +296,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Element Subdomain"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -306,8 +308,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Element Subdomain"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -318,8 +320,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Email Relay"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -330,8 +332,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Email Relay"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -342,8 +344,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Jitsi"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -354,8 +356,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Jitsi"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -366,8 +368,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure ma1sd (Advanced)"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -378,8 +380,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure ma1sd (Advanced)"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -390,8 +392,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Synapse"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -402,8 +404,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Synapse"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -414,8 +416,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Synapse Admin"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -426,8 +428,8 @@
     job_template: "{{ matrix_domain }} - 1 - Configure Synapse Admin"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -438,8 +440,8 @@
     job_template: "{{ matrix_domain }} - 2 - Create User"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -450,8 +452,8 @@
     job_template: "{{ matrix_domain }} - 2 - Create User"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -462,8 +464,8 @@
     job_template: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -474,8 +476,8 @@
     job_template: "{{ matrix_domain }} - 2 - Purge Media (Advanced)"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -486,8 +488,8 @@
     job_template: "{{ matrix_domain }} - 2 - Purge Database (Advanced)"
     role: execute
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -498,8 +500,8 @@
     job_template: "{{ matrix_domain }} - 2 - Purge Database (Advanced)"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: matrix_domain is defined
 
@@ -507,8 +509,8 @@
   delegate_to: 127.0.0.1
   awx.awx.tower_job_launch:
     job_template: "{{ matrix_domain }} - 0 - Stop all Services"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   register: job
   when: matrix_domain is defined
@@ -517,8 +519,8 @@
   awx.awx.tower_job_wait:
     job_id: "{{ job.id }}"
     timeout: 300
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   ignore_errors: yes
   when: matrix_domain is defined
@@ -528,7 +530,16 @@
   awx.awx.tower_job_launch:
     job_template: "0 - {{ subscription_id }} - << SUBSCRIPTION DELETION IN PROGRESS >>"
     extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/delete_extra_vars.json') }}"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: delete_subscription_hours_delay | int == 0
+
+- name: Delete the AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: absent
+    existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"

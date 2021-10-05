@@ -1,0 +1,7 @@
+
+- name: Update 'Spantaleev's Deploy' project for a specific user
+  awx.awx.tower_project_update:
+    name: "{{ item }} - Matrix Docker Ansible Deploy"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+    validate_certs: yes 

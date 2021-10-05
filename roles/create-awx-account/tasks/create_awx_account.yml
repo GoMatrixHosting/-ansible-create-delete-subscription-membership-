@@ -8,17 +8,19 @@
     file: /var/lib/awx/projects/hosting/vaulted_ssh_password.yml
   no_log: true
 
-- name: Install jq in AWX
-  delegate_to: 127.0.0.1
-  yum:
-    name: jq
-    state: latest
+- name: Include AWX master token from awx_tokens.yml
+  include_vars:
+    file: /var/lib/awx/projects/hosting/awx_tokens.yml
+  no_log: True
 
-- name: Collect AWX admin token the hard way!
-  delegate_to: 127.0.0.1
-  shell: |
-      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-  register: tower_token
+- name: Create a AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_master_token }}"
+  register: awx_session_token
   no_log: True
 
 - name: Add tower inventory
@@ -27,8 +29,8 @@
     description: "{{ client_email }} inventory"
     organization: "{{ member_id }}"
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Allow team to administrate/use this inventory
@@ -37,8 +39,8 @@
     inventory: "{{ member_id }}"
     role: use
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Add dummyvalue.com host to organisations inventory
@@ -47,8 +49,8 @@
     description: "A placeholder host, because ansible needs a host to work on. :)"
     inventory: "{{ member_id }}"
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Add backup server host to organisations inventory
@@ -60,8 +62,8 @@
     variables:
       ansible_host: "{{ backup_server_ip }}"
       ansible_port: "{{ backup_server_ssh_port }}"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: backup_server_enabled|bool
 
@@ -74,8 +76,8 @@
     inputs:
       ssh_key_data: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_private.key') }}"
       ssh_key_unlock: "{{ client_private_ssh_key_password }}"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Allow team to view the 'AWX SSH Key' credential
@@ -84,8 +86,8 @@
     credential: "{{ member_id }} - AWX SSH Key"
     role: use
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Add 'Ansible Provision Server' project to users organisation
@@ -99,8 +101,8 @@
     scm_delete_on_update: yes
     scm_update_on_launch: yes
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Allow team to read 'Ansible Provision Server' project
@@ -109,8 +111,8 @@
     project: "{{ member_id }} - Ansible Provision Server"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Add 'Spantaleev's Deploy' project to users organisation
@@ -122,10 +124,10 @@
     scm_url: '{{ deploy_source }}'
     scm_branch: '{{ deploy_branch }}'
     scm_delete_on_update: yes
-    scm_update_on_launch: yes
+    scm_update_on_launch: no
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Allow team to read 'Spantaleev's Deploy' project
@@ -134,8 +136,8 @@
     project: "{{ member_id }} - Matrix Docker Ansible Deploy"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Create 'Provision a New Server' job template
@@ -154,8 +156,8 @@
     verbosity: 1
     job_tags: imposter-check, setup-firewall, setup-mailgun, setup-export, setup-backup
     skip_tags: digitalocean-space
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: subscription_type == 'digitalocean'
 
@@ -175,8 +177,8 @@
     verbosity: 1
     job_tags: imposter-check, setup-firewall, setup-mailgun, setup-export, setup-backup
     skip_tags: digitalocean-space, digitalocean-droplet
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: subscription_type == 'on_premises'
 
@@ -186,8 +188,15 @@
     job_template: "0 - {{ subscription_id }} - Provision a New Server"
     role: execute
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
-
+- name: Delete the AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: absent
+    existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"

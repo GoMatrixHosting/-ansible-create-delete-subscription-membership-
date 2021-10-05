@@ -4,12 +4,19 @@
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
   no_log: True
 
-- name: Collect AWX admin token the hard way!
-  delegate_to: 127.0.0.1
-  connection: local
-  shell: |
-      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-  register: tower_token
+- name: Include AWX master token from awx_tokens.yml
+  include_vars:
+    file: /var/lib/awx/projects/hosting/awx_tokens.yml
+  no_log: True
+
+- name: Create a AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_master_token }}"
+  register: awx_session_token
   no_log: True
 
 - name: Add wireguard host to organisations inventory
@@ -23,8 +30,8 @@
     variables:
       ansible_host: "{{ server_ip }}"
       ansible_port: "2222"
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
@@ -66,8 +73,8 @@
     survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json') }}"
     state: present
     verbosity: 1
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
 - name: Allow team to view 'Provision Wireguard Server' job template
@@ -78,6 +85,15 @@
     job_template: "0 - {{ subscription_id }} - Provision Wireguard Server"
     role: read
     state: present
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
+
+- name: Delete the AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: absent
+    existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"

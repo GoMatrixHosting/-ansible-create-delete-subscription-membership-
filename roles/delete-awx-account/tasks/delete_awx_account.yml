@@ -5,11 +5,14 @@
     name: jq
     state: latest
     
-- name: Collect AWX admin token the hard way!
-  delegate_to: 127.0.0.1
-  shell: |
-      curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-  register: tower_token
+- name: Create a AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_master_token }}"
+  register: awx_session_token
   no_log: True
 
 - name: Remove 'Ansible Provision Server' project from users organisation
@@ -21,8 +24,8 @@
     scm_url: "https://gitlab.com/GoMatrixHosting/ansible-provision-server.git"
     scm_delete_on_update: yes
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   ignore_errors: True
 
@@ -35,8 +38,8 @@
     scm_url: "https://gitlab.com/GoMatrixHosting/gomatrixhosting-matrix-docker-ansible-deploy.git"
     scm_delete_on_update: yes
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   ignore_errors: True
 
@@ -46,8 +49,8 @@
     target_team: "{{ member_id }}"
     role: member
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: client_email is defined
   ignore_errors: True
@@ -57,8 +60,8 @@
     username: "{{ client_email }}"
     email: "dummyvalue@protonmail.com"
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: client_email is defined
 
@@ -67,8 +70,8 @@
     name: "{{ member_id }}"
     organization: "{{ member_id }}"
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   ignore_errors: True
 
@@ -77,8 +80,17 @@
     name: "{{ member_id }}"
     description: "{{ client_email }} Organisation"
     state: absent
-    tower_host: "https://{{ tower_host }}"
-    tower_oauthtoken: "{{ tower_token.stdout }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   when: client_email is defined
   register: awxorg
+
+- name: Delete the AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: absent
+    existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"

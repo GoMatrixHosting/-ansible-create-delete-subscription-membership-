@@ -10,12 +10,20 @@
         file: /var/lib/awx/projects/hosting/hosting_vars.yml
       no_log: True
 
-    - name: Collect AWX admin token the hard way!
-      delegate_to: 127.0.0.1
-      shell: |
-          curl -sku {{ tower_username }}:{{ tower_password }} -H "Content-Type: application/json" -X POST -d '{"description":"Tower CLI", "application":null, "scope":"write"}' https://{{ tower_host }}/api/v2/users/1/personal_tokens/ | jq '.token' | sed -r 's/\"//g'
-      register: tower_token
-      no_log: True 
+    - name: Include AWX master token from awx_tokens.yml
+      include_vars:
+        file: /var/lib/awx/projects/hosting/awx_tokens.yml
+      no_log: True
+
+    - name: Create a AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: present
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_master_token }}"
+      register: awx_session_token
+      no_log: True
 
     - name: Add enterprise user to the appropriate team
       awx.awx.tower_role:
@@ -23,6 +31,15 @@
         target_team: "{{ member_id }}"
         role: member
         state: present
-        tower_host: "https://{{ tower_host }}"
-        tower_oauthtoken: "{{ tower_token.stdout }}"
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
         validate_certs: yes
+
+    - name: Delete the AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: absent
+        existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
