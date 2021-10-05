@@ -1,4 +1,16 @@
 
+- debug:
+    msg: "{{ item }}"
+
+- debug:
+    msg: "{{ id_array.0 }}"
+
+- debug:
+    msg: "{{ id_array.1 }}"
+
+- debug:
+    msg: "0 - {{ id_array.1 }} - Provision a New Server"
+
 - name: Collect necessary variables from input
   set_fact:
     id_array: "{{ item.split(',') }}"
