@@ -35,7 +35,7 @@
       "default": "element",
       "choices": "",
       "new_question": true,
-      "variable": "element_subdomain",
+      "variable": "awx_element_subdomain",
       "type": "text"
     },
     {
