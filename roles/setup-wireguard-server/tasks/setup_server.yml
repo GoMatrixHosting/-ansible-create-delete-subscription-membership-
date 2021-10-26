@@ -25,7 +25,8 @@
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
-  when: debian_version.stdout == VERSION_ID=\"10\"
+#  when: debian_version.stdout == VERSION_ID=\"10\"
+  when: "debian_version.stdout.find('v=' ~ 10) == -1"
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
