@@ -1,3 +1,4 @@
 {
-  "ansible_port": "2222"
+  "ansible_port": "2222",
+  "update_ssh_key": "False"
 }

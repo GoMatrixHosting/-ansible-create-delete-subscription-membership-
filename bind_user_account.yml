@@ -25,15 +25,6 @@
       register: awx_session_token
       no_log: True
 
-    - debug:
-        msg: "{{ client_email }}"
-
-    - debug:
-        msg: "{{ member_id }}"
-        
-    - debug:
-        msg: "{{ awx_session_token.ansible_facts.tower_token.token }}"
-
     - name: Add enterprise user to the appropriate team
       awx.awx.tower_role:
         user: "{{ client_email }}"
