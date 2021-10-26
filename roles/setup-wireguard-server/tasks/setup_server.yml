@@ -16,7 +16,7 @@
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
-  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version = 10 )
+  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version == 10 )
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
@@ -24,27 +24,27 @@
     pkg:
      - wireguard
     default_release: buster-backports
-  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version = 10 )
+  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version == 10 )
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - wireguard
-  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version = 11 )
+  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version == 11 )
 
 - name: Collect kernel version
   delegate_to: "{{ server_ip }}"
   shell: uname -r
   register: kernel_version
-  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version = 10 )
+  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version == 10 )
   
 - name: Install Linux headers and other packages on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - "linux-headers-{{ kernel_version.stdout }}"
-  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version = 10 )
+  when: ( ansible_distribution == Debian ) and ( ansible_distribution_version == 10 )
 
 - name: Install Linux headers and other packages on wireguard server
   delegate_to: "{{ server_ip }}"
