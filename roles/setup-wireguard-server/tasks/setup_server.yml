@@ -13,7 +13,8 @@
 
 - name: Collect Debian version from Wireguard server
   delegate_to: "{{ server_ip }}"
-  command: cat /etc/os-release | grep VERSION_ID
+  command: |
+    cat /etc/os-release | grep VERSION_ID
   register: debian_version
   
 - debug:
