@@ -15,12 +15,6 @@
   delegate_to: "{{ server_ip }}"
   command: lsb_release -c
   register: debian_version
-  
-- debug:
-    msg: "debian_version.stdout: {{ debian_version.stdout }}"
-
-#'Codename:	buster'
-#'Codename:	bullseye'
 
 - name: Setting facts for checking the release
   set_fact:
@@ -34,7 +28,7 @@
     state: present
   when: buster_string in debian_version.stdout
 
-- name: Install necessary utils on wireguard server
+- name: Install wireguard from backports on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
@@ -42,7 +36,7 @@
     default_release: buster-backports
   when: buster_string in debian_version.stdout
 
-- name: Install necessary utils on wireguard server
+- name: Install wireguard on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
@@ -55,14 +49,14 @@
   register: kernel_version
   when: buster_string in debian_version.stdout
 
-- name: Install Linux headers and other packages on wireguard server
+- name: Install Linux headers on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - "linux-headers-{{ kernel_version.stdout }}"
   when: buster_string in debian_version.stdout
 
-- name: Install Linux headers and other packages on wireguard server
+- name: Install other packages on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
