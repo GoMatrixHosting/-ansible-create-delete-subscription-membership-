@@ -13,20 +13,21 @@
 
 - name: Collect Debian version from Wireguard server
   delegate_to: "{{ server_ip }}"
-  shell: |
-    cat /etc/os-release | grep VERSION_ID
+  command: lsb_release -c
   register: debian_version
   
 - debug:
     msg: "debian_version.stdout: {{ debian_version.stdout }}"
+
+#'Codename:	buster'
+#'Codename:	bullseye'
 
 - name: Add buster-backports repository into sources list
   delegate_to: "{{ server_ip }}"
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
-#  when: debian_version.stdout == VERSION_ID=\"10\"
-  when: "debian_version.stdout.find('v=' ~ 10) == -1"
+  when: "debian_version.stdout.find('v=' ~ buster) == -1"
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
@@ -34,27 +35,27 @@
     pkg:
      - wireguard
     default_release: buster-backports
-  when: debian_version.stdout == VERSION_ID=\"10\"
+  when: "debian_version.stdout.find('v=' ~ buster) == -1"
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - wireguard
-  when: debian_version.stdout == VERSION_ID="11"
+  when: "debian_version.stdout.find('v=' ~ bullseye) == -1"
 
 - name: Collect kernel version
   delegate_to: "{{ server_ip }}"
   shell: uname -r
   register: kernel_version
-  when: debian_version.stdout == VERSION_ID=\"10\"
-  
+  when: "debian_version.stdout.find('v=' ~ buster) == -1"
+
 - name: Install Linux headers and other packages on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - "linux-headers-{{ kernel_version.stdout }}"
-  when: debian_version.stdout == VERSION_ID=\"10\"
+  when: "debian_version.stdout.find('v=' ~ buster) == -1"
 
 - name: Install Linux headers and other packages on wireguard server
   delegate_to: "{{ server_ip }}"
