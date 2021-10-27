@@ -27,7 +27,7 @@
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
-  when: "debian_version.stdout.find('v=' ~ buster) == -1"
+  when: "debian_version.stdout.find('v=' ~ 'buster') == -1"
 
 - name: Install necessary utils on wireguard server
   delegate_to: "{{ server_ip }}"
