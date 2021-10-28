@@ -1,3 +1,4 @@
+--
 
 - name: Extract wg-ifupdown.tar.gz into /root
   delegate_to: "{{ server_ip }}"
@@ -158,3 +159,4 @@
   reboot:
     reboot_timeout: 5
   ignore_errors: yes
+  when: buster_string in debian_version.stdout
