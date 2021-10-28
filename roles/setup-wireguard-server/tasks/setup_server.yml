@@ -1,4 +1,3 @@
---
 
 - name: Update repositories and all packages on target machine
   delegate_to: "{{ server_ip }}"
