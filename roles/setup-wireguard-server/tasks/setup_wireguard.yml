@@ -154,6 +154,7 @@
     state: reloaded
 
 - name: Raise the wireguard interface
+  delegate_to: "{{ server_ip }}"
   command: ifup wg0
   when: bullseye_string in debian_version.stdout
 
