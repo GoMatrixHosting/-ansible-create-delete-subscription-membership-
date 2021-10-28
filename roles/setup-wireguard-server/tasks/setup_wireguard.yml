@@ -153,14 +153,14 @@
   ufw:
     state: reloaded
 
-- name: Raise the wireguard interface
-  delegate_to: "{{ server_ip }}"
-  command: ifup wg0
-  when: bullseye_string in debian_version.stdout
+#- name: Raise the wireguard interface
+#  delegate_to: "{{ server_ip }}"
+#  command: ifup wg0
+#  when: bullseye_string in debian_version.stdout
 
 - name: Reboot server to fix wireguard
   delegate_to: "{{ server_ip }}"
   reboot:
     reboot_timeout: 5
   ignore_errors: yes
-  when: buster_string in debian_version.stdout
+#  when: buster_string in debian_version.stdout
