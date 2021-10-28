@@ -1,4 +1,3 @@
---
 
 - name: Extract wg-ifupdown.tar.gz into /root
   delegate_to: "{{ server_ip }}"
