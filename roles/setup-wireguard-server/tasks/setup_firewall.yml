@@ -220,5 +220,5 @@
 - name: Enable UFW
   delegate_to: "{{ server_ip }}"
   ufw:
-    state: reloaded
+    state: enabled
 
