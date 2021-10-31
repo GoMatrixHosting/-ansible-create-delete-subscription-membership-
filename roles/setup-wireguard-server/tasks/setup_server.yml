@@ -11,32 +11,58 @@
     name: "*"
     state: latest
 
+- name: Collect Debian version from Wireguard server
+  delegate_to: "{{ server_ip }}"
+  command: lsb_release -c
+  register: debian_version
+
+- name: Setting facts for checking the release
+  set_fact:
+    buster_string: "buster"
+    bullseye_string: "bullseye"
+
 - name: Add buster-backports repository into sources list
   delegate_to: "{{ server_ip }}"
   apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
+  when: buster_string in debian_version.stdout
 
-- name: Install necessary utils on wireguard server
+- name: Install wireguard from backports on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - wireguard
     default_release: buster-backports
+  when: buster_string in debian_version.stdout
+
+- name: Install wireguard on wireguard server
+  delegate_to: "{{ server_ip }}"
+  apt:
+    pkg:
+     - wireguard
+  when: bullseye_string in debian_version.stdout
 
 - name: Collect kernel version
   delegate_to: "{{ server_ip }}"
   shell: uname -r
   register: kernel_version
+  when: buster_string in debian_version.stdout
 
-- name: Install Linux headers and other packages on wireguard server
+- name: Install Linux headers on wireguard server
+  delegate_to: "{{ server_ip }}"
+  apt:
+    pkg:
+     - "linux-headers-{{ kernel_version.stdout }}"
+  when: buster_string in debian_version.stdout
+
+- name: Install other packages on wireguard server
   delegate_to: "{{ server_ip }}"
   apt:
     pkg:
      - prometheus-node-exporter
      - unattended-upgrades
      - apt-listchanges
-     - "linux-headers-{{ kernel_version.stdout }}"
   ignore_errors: True
 
 - name: Adjust environment file for Node Exporter

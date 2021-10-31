@@ -1,12 +1,23 @@
-    
+
+- name: Set the new authorized key taken from file
+  delegate_to: "{{ server_ip }}"
+  authorized_key:
+    user: root
+    state: present
+    exclusive: yes
+    key: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_public.key') }}"
+  when: update_ssh_key | bool
+
 - name: Include hosting vars of digital_ocean.yml
   include_vars:
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
+  when: update_ssh_key | bool
   no_log: True
 
 - name: Include AWX master token from awx_tokens.yml
   include_vars:
     file: /var/lib/awx/projects/hosting/awx_tokens.yml
+  when: update_ssh_key | bool
   no_log: True
 
 - name: Create a AWX session token for executing modules
@@ -17,34 +28,10 @@
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_master_token }}"
   register: awx_session_token
+  when: update_ssh_key | bool
   no_log: True
 
-- name: Add wireguard host to organisations inventory
-  awx.awx.tower_host:
-    name: "wireguard.{{ matrix_domain }}"
-    description: "{{ matrix_domain }} Wireguard Proxy"
-    inventory: "{{ member_id }}"
-    state: present
-    variables:
-      ansible_host: "{{ server_ip }}"
-      ansible_port: "2222"
-    tower_host: "https://{{ awx_host }}"
-    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
-    validate_certs: yes
-
-- name: Save new 'Provision Wireguard Server' survey.json to the AWX tower, template
-  template:
-    src: '{{ role_path }}/surveys/setup_wireguard_server.json.j2'
-    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json'
-
-- name: Copy wireguard templates extra_vars to the AWX tower
-  copy:
-    src: '{{ role_path }}/extra-vars/wireguard_vars.json'
-    dest: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json'
-
-# No access to host yet to save this remotely
-
-- name: Create '0 - {{ subscription_id }} - Provision Wireguard Server' job template
+- name: Re-create '0 - {{ subscription_id }} - Provision Wireguard Server' job template
   awx.awx.tower_job_template:
     name: "0 - {{ subscription_id }} - Provision Wireguard Server"
     description: "Configures a wireguard server AWX can use to SSH into an on-premises server."
@@ -61,16 +48,7 @@
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
-
-- name: Allow team to view 'Provision Wireguard Server' job template
-  awx.awx.tower_role:
-    team: "{{ member_id }}"
-    job_template: "0 - {{ subscription_id }} - Provision Wireguard Server"
-    role: read
-    state: present
-    tower_host: "https://{{ awx_host }}"
-    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
-    validate_certs: yes
+  when: update_ssh_key | bool
 
 - name: Delete the AWX session token for executing modules
   awx.awx.tower_token:
@@ -80,3 +58,13 @@
     existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+  when: update_ssh_key | bool
+
+- name: Set boolean value to exit playbook
+  set_fact:
+    end_playbook: true
+  when: update_ssh_key | bool
+
+- name: End playbook if this task list is called.
+  meta: end_play
+  when: ( end_playbook is defined ) and ( end_playbook | bool ) and ( update_ssh_key | bool )
