@@ -1,0 +1,64 @@
+
+- name: Set the new authorized key taken from file
+  delegate_to: "{{ server_ip }}"
+  authorized_key:
+    user: root
+    state: present
+    exclusive: yes
+    key: "{{ lookup('file', '/var/lib/awx/projects/hosting/client_public.key') }}"
+  when: update_ssh_key | bool
+
+- name: Include AWX master token from awx_tokens.yml
+  include_vars:
+    file: /var/lib/awx/projects/hosting/awx_tokens.yml
+  when: update_ssh_key | bool
+  no_log: True
+
+- name: Create a AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: present
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_master_token }}"
+  register: awx_session_token
+  when: update_ssh_key | bool
+  no_log: True
+
+- name: Re-create '0 - {{ subscription_id }} - Provision Wireguard Server' job template
+  awx.awx.tower_job_template:
+    name: "0 - {{ subscription_id }} - Provision Wireguard Server"
+    description: "Configures a wireguard server AWX can use to SSH into an on-premises server."
+    job_type: run
+    inventory: "{{ member_id }}"
+    credential: "{{ member_id }} - AWX SSH Key"
+    project: "Ansible Create Delete Subscription Membership"
+    playbook: setup_wireguard_server.yml
+    extra_vars: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/wireguard_vars.json') }}"
+    survey_enabled: true
+    survey_spec: "{{ lookup('file', '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/setup_wireguard_server.json') }}"
+    state: present
+    verbosity: 1
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+    validate_certs: yes
+  when: update_ssh_key | bool
+
+- name: Delete the AWX session token for executing modules
+  awx.awx.tower_token:
+    description: 'AWX Session Token'
+    scope: "write"
+    state: absent
+    existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+  when: update_ssh_key | bool
+
+- name: Set boolean value to exit playbook
+  set_fact:
+    end_playbook: true
+  when: update_ssh_key | bool
+
+- name: End playbook if this task list is called.
+  meta: end_play
+  when: ( end_playbook is defined ) and ( end_playbook | bool ) and ( update_ssh_key | bool )

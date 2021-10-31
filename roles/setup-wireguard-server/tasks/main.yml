@@ -2,6 +2,9 @@
 # Connect a wireguard server
 - import_tasks: "{{ role_path }}/tasks/connect_server.yml"
 
+# Rotate SSH key if prompted
+- import_tasks: "{{ role_path }}/tasks/rotate_ssh.yml"
+
 # Connect the server to AWX
 - import_tasks: "{{ role_path }}/tasks/awx_config.yml"
 
