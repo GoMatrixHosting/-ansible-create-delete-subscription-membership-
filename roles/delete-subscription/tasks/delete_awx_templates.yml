@@ -49,6 +49,19 @@
     validate_certs: yes
   when: matrix_domain is defined
 
+- name: Remove 'Upgrade Distribution' job template
+  delegate_to: 127.0.0.1
+  awx.awx.tower_job_template:
+    name: "{{ matrix_domain }} - 00 - Upgrade Distribution"
+    job_type: run
+    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
+    playbook: setup.yml
+    state: absent
+    tower_host: "https://{{ awx_host }}"
+    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
+    validate_certs: yes
+  when: matrix_domain is defined
+
 - name: Remove 'Rotate SSH Key' job template
   delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
