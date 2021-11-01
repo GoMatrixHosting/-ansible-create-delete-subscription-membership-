@@ -20,12 +20,12 @@
     - name: Set deploy_all fact
       set_fact:
         deploy_all: True
-      when: ( update_result.before != update_result.after ) and ( update_result.before ) or ( force_update | bool )
+      when: ( ( update_result.before != update_result.after ) and ( update_result.before ) ) or ( force_update | bool )
 
     - name: Set deploy_all fact
       set_fact:
         deploy_all: False
-      when: ( update_result.before == update_result.after ) or ( not update_result.before )
+      when: ( ( update_result.before == update_result.after ) or ( not update_result.before ) ) and ( not force_update | bool )
 
     - name: Include AWX master token from awx_tokens.yml
       include_vars:
