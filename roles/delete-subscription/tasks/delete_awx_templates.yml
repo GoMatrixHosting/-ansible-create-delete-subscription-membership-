@@ -38,32 +38,6 @@
     tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
 
-- name: Remove schedule for 'Deploy a New Server' job template
-  delegate_to: 127.0.0.1
-  awx.awx.tower_schedule:
-    name: "{{ matrix_domain }} - 0 - Update Server Schedule"
-    enabled: yes
-    state: absent
-    tower_host: "https://{{ awx_host }}"
-    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
-    validate_certs: yes
-  when: matrix_domain is defined
-
-# ^ what is this?
-
-- name: Remove 'Upgrade Distribution' job template
-  delegate_to: 127.0.0.1
-  awx.awx.tower_job_template:
-    name: "{{ matrix_domain }} - 00 - Upgrade Distribution"
-    job_type: run
-    project: "{{ member_id }} - Matrix Docker Ansible Deploy"
-    playbook: setup.yml
-    state: absent
-    tower_host: "https://{{ awx_host }}"
-    tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
-    validate_certs: yes
-  when: matrix_domain is defined
-
 - name: Remove 'Rotate SSH Key' job template
   delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
