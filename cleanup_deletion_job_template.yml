@@ -5,9 +5,9 @@
   gather_facts: false
 
   tasks:
-    - name: Pause for 10 seconds to the previous job can finish
+    - name: Pause for 30 seconds to the previous job can finish
       pause:
-       seconds: 10
+       seconds: 30
 
     - name: Include hosting vars
       include_vars:

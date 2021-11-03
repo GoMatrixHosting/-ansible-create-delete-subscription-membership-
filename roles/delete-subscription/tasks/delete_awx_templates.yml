@@ -49,6 +49,8 @@
     validate_certs: yes
   when: matrix_domain is defined
 
+# ^ what is this?
+
 - name: Remove 'Upgrade Distribution' job template
   delegate_to: 127.0.0.1
   awx.awx.tower_job_template:
