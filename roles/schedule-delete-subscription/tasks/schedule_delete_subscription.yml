@@ -538,6 +538,7 @@
     validate_certs: yes
   register: job
   when: matrix_domain is defined
+  ignore_errors: yes
 
 - name: Wait for job max 300s
   awx.awx.tower_job_wait:
