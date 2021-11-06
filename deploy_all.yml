@@ -69,7 +69,7 @@
       register: deploy_templates
 
     - name: Execute every job template sequentially (launch all deploys)
-      include_tasks: deploy_launch.yml 
+      include_tasks: job_launch.yml 
       loop: "{{ deploy_templates.stdout_lines | flatten(levels=1) }}"
       when: deploy_all | bool
 
