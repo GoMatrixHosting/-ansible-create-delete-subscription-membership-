@@ -15,6 +15,10 @@
 - import_tasks: "{{ role_path }}/tasks/delete_awx_templates.yml"
   tags: delete-subscription
 
+# Move the Servers Backup Directory
+- import_tasks: "{{ role_path }}/tasks/move_backup_directory.yml"
+  tags: delete-subscription
+
 # Delete Organisation Directories
 - import_tasks: "{{ role_path }}/tasks/delete_subscription_directory.yml"
   tags: delete-subscription

@@ -1,0 +1,10 @@
+
+- name: Collect current datetime
+  set_fact:
+    awx_datetime: "{{ lookup('pipe', 'date +%Y-%m-%d_%H:%M') }}"
+
+- name: Move the servers directory on the backup server
+  delegate_to: "{{ backup_server_ip }}"
+  command: |
+    mv {{ backup_server_directory }}/Clients/{{ matrix_domain }} {{ backup_server_directory }}/Clients/{{ matrix_domain }}_{{ awx_datetime }}
+  ignore_errors: yes

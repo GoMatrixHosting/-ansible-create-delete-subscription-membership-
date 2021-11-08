@@ -53,10 +53,12 @@
     tower_host: "https://{{ awx_host }}"
     tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
 
-- name: Set boolean value to exit playbook
-  set_fact:
-    end_playbook: true
+# isn't this ended anyway??
 
-- name: End playbook if this task list is called.
-  meta: end_play
-  when: end_playbook is defined and end_playbook|bool
+#- name: Set boolean value to exit playbook
+#  set_fact:
+#    end_playbook: true
+
+#- name: End playbook if this task list is called.
+#  meta: end_play
+#  when: end_playbook is defined and end_playbook|bool
