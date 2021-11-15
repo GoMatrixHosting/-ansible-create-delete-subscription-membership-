@@ -68,8 +68,9 @@
 - name: Generate random string for subscription_id
   shell: tr -dc A-Z0-9 </dev/urandom | head -c 12
   register: random_string
+  when: subscription_id is undefined
   
 - name: Set subscription_id
   set_fact:
     subscription_id: "T-{{ random_string.stdout }}"
-
+  when: subscription_id is undefined

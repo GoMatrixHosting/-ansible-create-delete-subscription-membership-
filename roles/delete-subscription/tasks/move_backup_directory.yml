@@ -3,6 +3,8 @@
   set_fact:
     awx_datetime: "{{ lookup('pipe', 'date +%Y-%m-%d_%H:%M') }}"
 
+# check if file exists first
+
 - name: Move the servers directory on the backup server
   delegate_to: "{{ backup_server_ip }}"
   command: |

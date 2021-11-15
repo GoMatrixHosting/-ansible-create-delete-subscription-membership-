@@ -71,6 +71,7 @@ INPUT (extra_variables):
 - client_email - used as the AWX login for that client. 
 - client_password
 - member_id - a unique value that represents this client.
+- (optional) subscription_id - a predefined subscription number (eg: 'T-GSXAZ4XLZNBB') if unspecified a value will be generated.
 - plan_title - name of the plan, possible values are:
 	- 'Micro DigitalOcean Server'
 	- 'Small DigitalOcean Server'
