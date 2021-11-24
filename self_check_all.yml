@@ -1,0 +1,44 @@
+
+- name: "Launches the diagnostic self-check template on every Matrix server connected to AWX."
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Include hosting vars of hosting_vars.yml
+      include_vars:
+        file: /var/lib/awx/projects/hosting/hosting_vars.yml
+      no_log: True
+
+    - name: Include AWX master token from awx_tokens.yml
+      include_vars:
+        file: /var/lib/awx/projects/hosting/awx_tokens.yml
+      no_log: True
+
+    - name: Create a AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: present
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_master_token }}"
+      register: awx_session_token
+      no_log: True
+
+    - name: Generate list of self-check job templates
+      shell: |
+        cat /var/lib/awx/projects/clients/*/*/server_vars.yml | grep matrix_domain | sed 's/^matrix_domain: //g' | sed -r 's/$/ - 0 - Self-Check/g'
+      register: self_check_templates
+
+    - name: Execute every job template sequentially (launch all deploys)
+      include_tasks: job_launch.yml 
+      loop: "{{ self_check_templates.stdout_lines | flatten(levels=1) }}"
+
+    - name: Delete the AWX session token for executing modules
+      awx.awx.tower_token:
+        description: 'AWX Session Token'
+        scope: "write"
+        state: absent
+        existing_token_id: "{{ awx_session_token.ansible_facts.tower_token.id }}"
+        tower_host: "https://{{ awx_host }}"
+        tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"

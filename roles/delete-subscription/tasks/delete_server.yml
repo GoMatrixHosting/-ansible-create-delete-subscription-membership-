@@ -22,7 +22,7 @@
     # needs ansible 2.8+ (AWX uses 2.9.10 at ) 
     state: absent
     id: '{{ do_droplet_id }}'
-    name: '{{ matrix_domain }}'
+    name: '{{ subscription_id | replace("_", "-") }}-{{ matrix_domain }}'
     oauth_token: '{{ do_api_token }}'
     size: '{{ slug_size }}'
     region: '{{ do_droplet_region }}'
