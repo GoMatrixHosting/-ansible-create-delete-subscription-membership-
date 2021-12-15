@@ -23,7 +23,7 @@
   register: awx_session_token
   no_log: True
 
-- name: Add tower inventory
+- name: Add client inventory
   awx.awx.tower_inventory:
     name: "{{ member_id }}"
     description: "{{ client_email }} inventory"
