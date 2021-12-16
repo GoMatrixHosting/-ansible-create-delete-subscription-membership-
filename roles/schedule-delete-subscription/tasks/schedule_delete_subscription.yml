@@ -537,7 +537,7 @@
     tower_oauthtoken: "{{ awx_session_token.ansible_facts.tower_token.token }}"
     validate_certs: yes
   register: job
-  when: matrix_domain is defined
+  when: ( matrix_domain is defined ) and ( stop_matrix_service | bool )
 
 - name: Wait for job max 300s
   awx.awx.tower_job_wait:
