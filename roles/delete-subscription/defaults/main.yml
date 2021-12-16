@@ -1,1 +1,4 @@
+# Used in raise-matrix-server where job template history should be preserved.
 delete_job_templates: 'true'
+# Used in raise-matrix-server where backup directory shouldnt be moved
+move_backup_directory: 'true'

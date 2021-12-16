@@ -1,1 +1,2 @@
+# Used in raise-matrix-server when this should be disabled.
 stop_matrix_service: 'true'
