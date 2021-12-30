@@ -5,17 +5,6 @@
     path: '/var/lib/awx/projects/clients/{{ member_id }}/{{ subscription_id }}/'
     state: absent
 
-- name: Collect current datetime
-  set_fact:
-    awx_datetime: "{{ lookup('pipe', 'date +%Y-%m-%d_%H:%M') }}"
-  when: move_backup_directory | bool
-
-- name: Move the backup directory on the backup server
-  delegate_to: '{{ backup_server_hostname }}'
-  command: |
-    mv {{ backup_server_directory }}/Clients/{{ matrix_domain }} {{ backup_server_directory }}/Clients/{{ matrix_domain }}_{{ awx_datetime }}
-  when: move_backup_directory | bool
-
 - name: Save new 'Delete Job Template' survey.json to the AWX tower, template
   delegate_to: 127.0.0.1
   template:

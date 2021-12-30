@@ -10,3 +10,5 @@
   command: |
     mv {{ backup_server_directory }}/Clients/{{ matrix_domain }} {{ backup_server_directory }}/Clients/{{ matrix_domain }}_{{ awx_datetime }}
   ignore_errors: yes
+
+# ^ THIS IS BROKEN, the AWX system can't connect to the backup server and do anything other then use borg!!
