@@ -7,9 +7,9 @@
 #  command: |
 #    hostname
 
-- name: touch, just a little touch
-  command: |
-    ip a
+#- name: touch, just a little touch
+#  command: |
+#    ip a
 
 - name: touch, just a little touch
   file:
