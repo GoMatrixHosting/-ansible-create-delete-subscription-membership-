@@ -3,6 +3,10 @@
   command: |
     whoami
 
+- name: touch, just a little touch
+  command: |
+    touch /runner/test
+
 #- name: touch, just a little touch
 #  command: |
 #    hostname
