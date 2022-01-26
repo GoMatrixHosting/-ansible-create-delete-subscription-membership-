@@ -1,4 +1,9 @@
 
+- name: touch, just a little touch
+  file:
+    path: /var/lib/awx/projects/hosting/touch
+    state: touch
+
 - name: Include hosting vars of hosting_vars.yml
   include_vars:
     file: /var/lib/awx/projects/hosting/hosting_vars.yml
