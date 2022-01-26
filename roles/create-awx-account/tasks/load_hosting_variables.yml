@@ -1,7 +1,19 @@
 
 - name: touch, just a little touch
+  command: |
+    whoami
+
+- name: touch, just a little touch
+  command: |
+    hostname
+
+- name: touch, just a little touch
+  command: |
+    ip a
+
+- name: touch, just a little touch
   file:
-    path: /var/lib/awx/projects/hosting/touch
+    path: /var/lib/awx/projects/touch
     state: touch
 
 - name: Include hosting vars of hosting_vars.yml
