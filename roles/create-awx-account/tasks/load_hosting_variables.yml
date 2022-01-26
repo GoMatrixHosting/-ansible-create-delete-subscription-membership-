@@ -3,9 +3,9 @@
   command: |
     whoami
 
-- name: touch, just a little touch
-  command: |
-    hostname
+#- name: touch, just a little touch
+#  command: |
+#    hostname
 
 - name: touch, just a little touch
   command: |
