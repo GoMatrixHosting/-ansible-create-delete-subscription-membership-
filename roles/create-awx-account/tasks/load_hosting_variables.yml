@@ -7,22 +7,6 @@
 #  command: |
 #    touch /runner/test
 
-- name: touch, just a little touch
-  command: |
-    ls /
-
-- name: touch, just a little touch
-  command: |
-    ls /runner/
-
-- name: touch, just a little touch
-  command: |
-    ls /var/lib/awx/
-
-- name: touch, just a little touch
-  command: |
-    ls /var/lib/awx/projects/
-
 #- name: touch, just a little touch
 #  file:
 #    path: /var/lib/awx/projects/touch
