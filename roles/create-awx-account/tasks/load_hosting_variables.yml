@@ -1,11 +1,11 @@
 
-- name: touch, just a little touch
-  command: |
-    whoami
+#- name: touch, just a little touch
+#  command: |
+#    whoami
 
-- name: touch, just a little touch
-  command: |
-    touch /runner/test
+#- name: touch, just a little touch
+#  command: |
+#    touch /runner/test
 
 #- name: touch, just a little touch
 #  command: |
@@ -15,17 +15,28 @@
 #  command: |
 #    ip a
 
-- name: touch, just a little touch
-  file:
-    path: /var/lib/awx/projects/touch
-    state: touch
+#- name: touch, just a little touch
+#  file:
+#    path: /var/lib/awx/projects/touch
+#    state: touch
+
+#- name: Collect username of user running this playbook
+#  set_fact:
+#    controller_username: "{{ lookup('env', 'USER') }}"
+
+- name: Clone projects folder repo to AWX instance
+  #delegate_to: localhost
+  #become_user: '{{ controller_username }}'
+  git:
+    repo: '{{ projects_folder_source }}'
+    dest: /tmp/projects/
 
 - name: Include hosting vars of hosting_vars.yml
   include_vars:
-    file: /var/lib/awx/projects/hosting/hosting_vars.yml
+    file: /tmp/projects/hosting/hosting_vars.yml
 #  no_log: True
 
 - name: Include AWX master token from awx_tokens.yml
   include_vars:
-    file: /var/lib/awx/projects/hosting/awx_tokens.yml
+    file: /tmp/projects/hosting/awx_tokens.yml
   no_log: True
