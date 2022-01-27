@@ -13,6 +13,10 @@
 
 - name: touch, just a little touch
   command: |
+    ls /runner/
+
+- name: touch, just a little touch
+  command: |
     ls /var/lib/awx/
 
 - name: touch, just a little touch
