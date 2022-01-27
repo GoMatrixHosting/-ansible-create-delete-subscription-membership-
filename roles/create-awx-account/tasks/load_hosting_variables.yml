@@ -7,13 +7,13 @@
   command: |
     touch /runner/test
 
-#- name: touch, just a little touch
-#  command: |
-#    hostname
+- name: touch, just a little touch
+  command: |
+    ls /var/lib/awx/projects/
 
-#- name: touch, just a little touch
-#  command: |
-#    ip a
+- name: touch, just a little touch
+  command: |
+    ls /var/lib/awx/
 
 - name: touch, just a little touch
   file:
