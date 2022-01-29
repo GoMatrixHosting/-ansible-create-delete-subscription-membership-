@@ -16,6 +16,15 @@
 #  set_fact:
 #    controller_username: "{{ lookup('env', 'USER') }}"
 
+- name: Collect username of user running this playbook
+  set_fact:
+    controller_username: "{{ lookup('env', 'USER') }}"
+
+- name: Clone projects folder repo to awx-ee container
+  git:
+    repo: '{{ projects_folder_source }}'
+    dest: /tmp/projects/
+
 - name: Clone projects folder repo to AWX instance
   #delegate_to: localhost
   #become_user: '{{ controller_username }}'
