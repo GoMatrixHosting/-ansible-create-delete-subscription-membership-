@@ -11,8 +11,10 @@
 - name: Install curl in AWX
   delegate_to: 127.0.0.1
   yum:
-    name: curl
-    state: latest
+    name: http://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/c/curl-7.61.1-22.el8.x86_64.rpm
+    disablerepo: "*"
+    disable_gpg_check: yes
+    state: present
 
 - name: Delete MailGun SMTP login
   delegate_to: 127.0.0.1
