@@ -2,8 +2,10 @@
 - name: Install jq in AWX
   delegate_to: 127.0.0.1
   yum:
-    name: jq
-    state: latest
+    name: http://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/j/jq-1.5-12.el8.x86_64.rpm
+    disablerepo: "*"
+    disable_gpg_check: yes
+    state: present
     
 - name: Create a AWX session token for executing modules
   awx.awx.tower_token:
